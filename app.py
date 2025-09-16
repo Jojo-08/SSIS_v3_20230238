@@ -10,6 +10,7 @@ def landing_screen():
 @app.route('/college/')
 def college():
     return 'colleges' 
+
 @app.route('/program/')
 def college():
     return 'programs' 
@@ -28,9 +29,8 @@ def college(studentID):
 
 @app.route('/program/<programCode>')
 def college(programCode):
-    return 'student : %s' % programCode
+    return 'program : %s' % programCode
 
 if __name__ == '__main__':
     app.debug = True
-    app.run()
     app.run(debug=True)
