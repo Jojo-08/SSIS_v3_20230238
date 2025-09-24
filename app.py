@@ -1,34 +1,33 @@
-from flask import Flask
+from flask import Flask, render_template
 
 app = Flask(__name__)
 
 @app.route('/')
-
 def landing_screen():
     return "Default"
 
 @app.route('/college/')
-def college():
+def colleges():
     return 'colleges' 
 
 @app.route('/program/')
-def college():
-    return 'programs' 
+def programs():
+    return render_template("program.html") 
 
 @app.route('/student/')
-def college():
-    return 'students' 
+def students():
+    return render_template("student.html") 
 
 @app.route('/college/<collegeCode>')
 def college(collegeCode):
     return 'college: %s' % collegeCode
 
 @app.route('/student/<int:studentID>')
-def college(studentID):
+def student(studentID):
     return 'student :%d' % studentID
 
 @app.route('/program/<programCode>')
-def college(programCode):
+def program(programCode):
     return 'program : %s' % programCode
 
 if __name__ == '__main__':
