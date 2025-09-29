@@ -5,12 +5,14 @@ app = Flask(__name__)
 @app.route('/')
 def landing_screen():
     return "Default"
+
 @app.route('/dashboard/')
 def dashboard():
     return render_template("dashboard.html")
+
 @app.route('/college/')
 def colleges():
-    return 'colleges' 
+    return render_template("college.html")
 
 @app.route('/program/')
 def programs():
