@@ -1,1 +1,23 @@
-{%extends 'entity_templates.html'%}
+{% extends 'entity_templates.html' %}
+{% block title %} Colleges {% endblock %}
+
+    {% block header1 %} <h2>Colleges</h2> {%endblock%}
+    {% block paragraph %}
+    <p> Manage your Colleges and their Information</p>
+    {% endblock %}
+
+        {% block header2%}
+                <h5 class="card-title" > Colleges(#)</h5>
+        {% endblock %}
+
+        {% block table_id %}college-table{% endblock %}
+
+        {% block table_head %}
+
+        {%endblock%}
+        
+        {% block pagination_id %} college-pagination {%endblock%}
+        
+        {% block pagination_items %}
+
+        {%endblock%}
