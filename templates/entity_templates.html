@@ -23,8 +23,8 @@
             {% block header2%}
             <h5 class="card-title" > Students(#)</h5>
             {% endblock %}
-            {%block table%}
-            <table class="table mt-2 table-striped text-center" id="{% block table_id} default-id{% endblock%}">
+            
+            <table class="table mt-2 table-striped text-center" id="{% block table_id %} default-id{% endblock%}">
 
                     <thead>
                         {% block table_head%}
@@ -68,7 +68,7 @@
                         {% endblock %}
                     </tbody>
             </table>
-            {%endblock%}
+    
             <nav>
                 <ul class="pagination justify-content-center" id="{% block pagination_id%} default-pagination {%endblock%}">
                     {% block pagination_items %}
