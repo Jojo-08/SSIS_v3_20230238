@@ -3,96 +3,106 @@
 {% block title %} Students Table {%endblock%}
 
 {% block content %}
-{% block header1%}
-    <h2> Students </h2>
-{%endblock%}
-{% block paragraph %}
-    <p> Manage your students and their Information</p>
-{% endblock %}
-<div class="container">
-    <div class="container-fluid">
-        <form class="d-flex" role="search">
-            <input class="form-control me-2" type="search" placeholder="Search" aira-label="Search">
 
-            <button type="button" class="btn btn-light">Filter</button>
-        </form>
-    </div>
-
-    <div class="container-fluid mt-2" >
-        <div class="card p-3">
-            {% block header2%}
-            <h5 class="card-title" > Students(#)</h5>
+    <div class="container">
+        <div class="d-flex">
+            {% block header1%}
+                <h2> Students </h2>
+            {%endblock%}
+            {% block paragraph %}
+                <p> Manage your students and their Information</p>
             {% endblock %}
-            
-            <table class="table mt-2 table-striped text-center" id="{% block table_id %} default-id{% endblock%}">
+        </div>
+        <div class="d-flex">
+            <button type="button" class="btn btn-success"> 
+                <i class="bi bi-plus-square"></i>
+            </button>
+        </div>
+    </div>
+    <div class="container">
+        <div class="container-fluid">
+            <form class="d-flex" role="search">
+                <input class="form-control me-2" type="search" placeholder="Search" aira-label="Search">
 
-                    <thead>
-                        {% block table_head%}
-                            <tr>
-                            <th scope="col">#</th>
-                            <th scope="col">First</th>
-                            <th scope="col">Last</th>
-                            <th scope="col">Handle</th>
-                            <th scope="col">Actions</th>
-                            </tr>
-                        {% endblock %}
-                    </thead>
-                    <tbody>
-                        {%block table_body %}
-                            <tr>
-                            <th scope="row">1</th>
-                            <td>Mark</td>
-                            <td>Otto</td>
-                            <td>@mdo</td>
-                            <td>
-                                <button class="btn btn-sm btn-success me-2"> 
-                                    <i class="bi bi-pencil"></i>
-                                </button>
-                                <button class="btn btn-sm btn-danger"> 
-                                    <i class="bi bi-trash"></i>
-                                </button>
-                            </td>
-                            </tr>
-                            <tr>
-                            <th scope="row">2</th>
-                            <td>Jacob</td>
-                            <td>Thornton</td>
-                            <td>@fat</td>
-                            </tr>
-                            <tr>
-                            <th scope="row">3</th>
-                            <td>John</td>
-                            <td>Doe</td>
-                            <td>@social</td>
-                            </tr>
-                        {% endblock %}
-                    </tbody>
-            </table>
-    
-            <nav>
-                <ul class="pagination justify-content-center" id="{% block pagination_id%} default-pagination {%endblock%}">
-                    {% block pagination_items %}
-                        <li class="page-item disabled">
-                            <a class="page-link" href="#"> Previous</a>
-                        </li>
-                        <li class="page-item active">
-                            <a class="page-link" href="#">1</a>
-                        </li>
-                        <li class="page-item">
-                            <a class="page-link" href="#">2</a>
-                        </li>
-                        <li class="page-item">
-                            <a class="page-link" href="#">3</a>
-                        </li>
-                        <li class="page-item">
-                            <a class="page-link" href="#">next</a>
-                        </li>
-                    {%endblock%}
-                </ul>
-            </nav>
+                <button type="button" class="btn btn-light">Filter</button>
+            </form>
         </div>
 
+        <div class="container-fluid mt-2" >
+            <div class="card p-3">
+                {% block header2%}
+                <h5 class="card-title" > Students(#)</h5>
+                {% endblock %}
+                
+                <table class="table mt-2 table-striped text-center" id="{% block table_id %} default-id{% endblock%}">
+
+                        <thead>
+                            {% block table_head%}
+                                <tr>
+                                <th scope="col">#</th>
+                                <th scope="col">First</th>
+                                <th scope="col">Last</th>
+                                <th scope="col">Handle</th>
+                                <th scope="col">Actions</th>
+                                </tr>
+                            {% endblock %}
+                        </thead>
+                        <tbody>
+                            {%block table_body %}
+                                <tr>
+                                <th scope="row">1</th>
+                                <td>Mark</td>
+                                <td>Otto</td>
+                                <td>@mdo</td>
+                                <td>
+                                    <button class="btn btn-sm btn-success me-2"> 
+                                        <i class="bi bi-pencil"></i>
+                                    </button>
+                                    <button class="btn btn-sm btn-danger"> 
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                </td>
+                                </tr>
+                                <tr>
+                                <th scope="row">2</th>
+                                <td>Jacob</td>
+                                <td>Thornton</td>
+                                <td>@fat</td>
+                                </tr>
+                                <tr>
+                                <th scope="row">3</th>
+                                <td>John</td>
+                                <td>Doe</td>
+                                <td>@social</td>
+                                </tr>
+                            {% endblock %}
+                        </tbody>
+                </table>
+        
+                <nav>
+                    <ul class="pagination justify-content-center" id="{% block pagination_id%} default-pagination {%endblock%}">
+                        {% block pagination_items %}
+                            <li class="page-item disabled">
+                                <a class="page-link" href="#"> Previous</a>
+                            </li>
+                            <li class="page-item active">
+                                <a class="page-link" href="#">1</a>
+                            </li>
+                            <li class="page-item">
+                                <a class="page-link" href="#">2</a>
+                            </li>
+                            <li class="page-item">
+                                <a class="page-link" href="#">3</a>
+                            </li>
+                            <li class="page-item">
+                                <a class="page-link" href="#">next</a>
+                            </li>
+                        {%endblock%}
+                    </ul>
+                </nav>
+            </div>
+
+        </div>
     </div>
-</div>
 
 {%endblock%}
