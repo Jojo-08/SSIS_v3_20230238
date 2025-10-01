@@ -5,19 +5,14 @@
 {% block content %}
 
     <div class="container">
-        <div class="d-flex">
-            {% block header1%}
-                <h2> Students </h2>
-            {%endblock%}
-            {% block paragraph %}
-                <p> Manage your students and their Information</p>
-            {% endblock %}
-        </div>
-        <div class="d-flex">
-            <button type="button" class="btn btn-success"> 
-                <i class="bi bi-plus-square"></i>
-            </button>
-        </div>
+
+        {% block header1%}
+            <h2> Students </h2>
+        {%endblock%}
+        {% block paragraph %}
+            <p> Manage your students and their Information</p>
+        {% endblock %}
+                
     </div>
     <div class="container">
         <div class="container-fluid">
@@ -30,10 +25,21 @@
 
         <div class="container-fluid mt-2" >
             <div class="card p-3">
-                {% block header2%}
-                <h5 class="card-title" > Students(#)</h5>
-                {% endblock %}
-                
+                <div class="container-fluid">
+                    <div class="row justify-content-between align-items-center">
+                        <div class="col">
+                            {% block header2%}
+                            <h5 class="card-title" > Students(#)</h5>
+                            {% endblock %}
+                        </div>
+                        <div class="col-auto">
+                            <button type="button" class="btn btn-success"> 
+                                <i class="bi bi-plus-square"></i>
+                                Add {% block label%}Student {%endblock%}
+                            </button>
+                        </div>
+                    </div>
+                </div>
                 <table class="table mt-2 table-striped text-center" id="{% block table_id %} default-id{% endblock%}">
 
                         <thead>
