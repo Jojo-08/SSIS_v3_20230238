@@ -1,0 +1,96 @@
+import re
+from app.database import get_db
+
+class Program:
+     
+    def __init__(self, program_code, program_name, college_code):
+        self.program_code = program_code
+        self.program_name = program_name
+        self.college_code = college_code
+        
+  
+
+    def get_all(page=1,per_page=20):
+        conn = get_db()
+        cur = conn.cursor()
+        offset = (page - 1) * per_page
+        cur.execute("SELECT * FROM programs ORDER by program_code LIMIT %s OFFSET %s",(per_page, offset))
+        programs = cur.fetchall()
+        cur.close()
+        return programs
+
+    def get_total_num():
+        conn = get_db()
+        cur = conn.cursor()
+        cur.execute("SELECT COUNT(*) as count FROM programs")
+        total = cur.fetchone()[0]
+        cur.close()
+        return total
+
+    def get_program(program_code):
+        conn = get_db()
+        cur = conn.cursor()
+        cur.execute("SELECT * FROM programs WHERE program_code = %s", (program_code))
+        program = cur.fetchone()
+        cur.close()
+        return program
+
+    def add_program(self):
+        
+        conn = get_db()
+        cur = conn.cursor()
+        try:
+            cur.execute("""INSERT INTO programs (program_code, program_name, college_code) 
+                        VALUES(%s,%s,%s)""",
+                        (self.program_code, self.program_name, self.college_code))
+
+            conn.commit()
+            return True
+
+        except Exception as e:
+            conn.rollback()
+            print(f"Error adding program: {e}")
+            return False, f"Error adding program: {e}"
+        finally:
+            cur.close()
+
+    def edit_program(self,program_code):
+        conn = get_db()
+        cur = conn.cursor()
+        try:
+            cur.execute("""UPDATE programs 
+                        SET program_code = %s, program_name = %s, college_code = %s
+                        WHERE program_code = %s""",
+                        (program_code,self.program_name,self.college_code,self.program_code))
+            
+            if cur.rowcount == 0:
+                conn.commit()
+                print(f"No program was found with code = {self.program_code}")
+                return False, f"No program was found with code = {self.program_code}"
+            conn.commit()
+            return True
+        
+        except Exception as e:
+            conn.rollback()
+            print(f"Error updating program: {e}")
+            return False, f"Error updating program: {e}"
+        finally:
+            cur.close()
+
+    def delete_program(program_code):
+        conn = get_db()
+        cur = conn.cursor()
+        try: 
+            cur.execute("DELETE FROM programs WHERE program_code = %s",(program_code))
+            if cur.rowcount == 0:
+                conn.commit()
+                print(f"No program was found with code = {program_code}")
+                return False, f"No program was found with code = {program_code}"
+            conn.commit()
+            return True
+        except Exception as e:
+            conn.rollback()
+            print(f"Error deleting program: {e}")
+            return False, f"Error deleting program: {e}"
+        finally:
+            cur.close()
