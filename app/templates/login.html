@@ -22,11 +22,7 @@ content %}
           form.remember_me.label(class="form-check-label") }}
         </div>
 
-        {{ form.submit(class="btn btn-primary w-100") }} {% with messages =
-        get_flashed_messages(with_categories=true) %} {% if messages %} {% for
-        category, message in messages %}
-        <div class="alert alert-{{ category }} mt-3">{{ message }}</div>
-        {% endfor %} {% endif %} {% endwith %}
+        {{ form.submit(class="btn btn-primary w-100") }}
       </form>
 
       <hr class="my-4" />

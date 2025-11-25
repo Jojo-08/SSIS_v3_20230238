@@ -38,6 +38,7 @@ def list_programs():
     return render_template('program/program.html', programs=programs, Total=total, page=page, add_form=add_form, program_forms=program_forms, open_modal=open_modal)
 
 @program_bp.route('/add', methods=['POST'])
+@login_required
 def add():
     is_ajax = request.headers.get('X-Requested-With') == 'XMLHttpRequest'
     
@@ -83,6 +84,7 @@ def add():
     return redirect(url_for('Program.list_programs', open_modal='addProgramModal'))
 
 @program_bp.route('/edit/<program_code>', methods=['POST'])
+@login_required
 def edit_program(program_code):
     is_ajax = request.headers.get('X-Requested-With') == 'XMLHttpRequest'
     
@@ -135,6 +137,7 @@ def edit_program(program_code):
     return redirect(url_for('Program.list_programs', open_modal=f'editProgramModal-{program_code}'))
 
 @program_bp.route('/delete/<program_code>', methods=['POST'])
+@login_required
 def delete_program(program_code):
     success, message = Program.delete_program(program_code)
 

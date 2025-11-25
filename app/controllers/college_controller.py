@@ -29,6 +29,7 @@ def list_colleges():
     return render_template('college/college.html', colleges=colleges, Total=total, page=page, add_form=add_form, college_forms=college_forms, open_modal=open_modal)
 
 @college_bp.route('/add', methods=['POST'])
+@login_required
 def add():
     is_ajax = request.headers.get('X-Requested-With') == 'XMLHttpRequest'
     
@@ -68,6 +69,7 @@ def add():
     return redirect(url_for('College.list_colleges', open_modal='addCollegeModal'))
 
 @college_bp.route('/edit/<college_code>', methods=['POST'])
+@login_required
 def edit_college(college_code):
     is_ajax = request.headers.get('X-Requested-With') == 'XMLHttpRequest'
     
@@ -115,6 +117,7 @@ def edit_college(college_code):
     return redirect(url_for('College.list_colleges', open_modal=f'editCollegeModal-{college_code}'))
 
 @college_bp.route('/delete/<college_code>', methods=['POST'])
+@login_required
 def delete_college(college_code):
     success, message = College.delete_college(college_code)
 

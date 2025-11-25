@@ -116,6 +116,7 @@ def list_students():
     return render_template('student/student.html', Total=total, page=page, add_form=add_form, student_forms=student_forms, students=students, open_modal=open_modal)
 
 @student_bp.route('/add', methods=['POST'])
+@login_required
 def add():
     is_ajax = request.headers.get('X-Requested-With') == 'XMLHttpRequest'
     
@@ -183,6 +184,7 @@ def add():
     return redirect(url_for('Student.list_students', open_modal='addStudentModal'))
 
 @student_bp.route('/edit/<student_id>', methods=['POST'])
+@login_required
 def edit_student(student_id):
     is_ajax = request.headers.get('X-Requested-With') == 'XMLHttpRequest'
     
@@ -264,6 +266,7 @@ def edit_student(student_id):
     return redirect(url_for('Student.list_students', open_modal=f'editStudentModal-{student_id}'))
 
 @student_bp.route('/delete/<student_id>', methods=['POST'])
+@login_required
 def delete_student(student_id):
     success, message = Student.delete_student(student_id)
 
