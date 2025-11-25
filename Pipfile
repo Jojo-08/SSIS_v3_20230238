@@ -9,6 +9,9 @@ psycopg2-binary = "*"
 python-dotenv = "*"
 flask-login = "*"
 flask-wtf = "*"
+supabase = "*"
+email-validator = "*"
+pillow = "*"
 
 [dev-packages]
 pytest = "*"

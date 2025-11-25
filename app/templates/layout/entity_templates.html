@@ -1,0 +1,174 @@
+{%extends 'layout/base.html'%} {% block title %} Students Table {%endblock%} {%
+block content %}
+
+<!-- Sortable Table Styles -->
+<style>
+  .sortable {
+    cursor: pointer;
+    user-select: none;
+    position: relative;
+    padding-right: 20px !important;
+  }
+  .sortable:hover {
+    background-color: rgba(0, 0, 0, 0.05);
+  }
+  .sortable::after {
+    content: "⇅";
+    position: absolute;
+    right: 5px;
+    opacity: 0.3;
+    font-size: 12px;
+  }
+  .sortable.asc::after {
+    content: "↑";
+    opacity: 1;
+  }
+  .sortable.desc::after {
+    content: "↓";
+    opacity: 1;
+  }
+  .search-highlight {
+    background-color: #fff3cd;
+  }
+</style>
+
+<div class="container">
+  {% block header1%}
+  <h2>Students</h2>
+  {%endblock%} {% block paragraph %}
+  <p>Manage your students and their Information</p>
+  {% endblock %}
+</div>
+<div class="container">
+  <div class="container-fluid">
+    <!-- Search Input -->
+    <div class="row">
+      <div class="col-md-6">
+        <div class="input-group">
+          <span class="input-group-text"><i class="bi bi-search"></i></span>
+          <input
+            class="form-control"
+            type="text"
+            id="searchInput"
+            placeholder="Type to search..."
+            aria-label="Search"
+          />
+          <button
+            class="btn btn-outline-secondary"
+            type="button"
+            id="clearSearch"
+          >
+            <i class="bi bi-x-lg"></i>
+          </button>
+        </div>
+        <small
+          id="searchResultCount"
+          class="text-muted"
+          style="display: none"
+        ></small>
+      </div>
+    </div>
+  </div>
+
+  <div class="container-fluid mt-2">
+    <div class="card p-3">
+      <div class="container-fluid">
+        <div class="row justify-content-between align-items-center">
+          <div class="col">
+            {% block header2%}
+            <h5 class="card-title">Students(#)</h5>
+            {% endblock %}
+          </div>
+          <div class="col-auto">
+            <button
+              type="button"
+              class="btn btn-success"
+              data-bs-toggle="modal"
+              data-bs-target="#{% block modal_target%}defaultModal{% endblock%}"
+            >
+              <i class="bi bi-plus-square"></i>
+              Add {% block label%}Student {%endblock%}
+            </button>
+          </div>
+        </div>
+      </div>
+      <table
+        class="table mt-2 table-striped text-center align-middle sortable-table"
+        id="{% block table_id %} default-id{% endblock%}"
+      >
+        <thead>
+          {% block table_head%}
+          <tr>
+            <th scope="col">#</th>
+            <th scope="col">First</th>
+            <th scope="col">Last</th>
+            <th scope="col">Handle</th>
+            <th scope="col">Actions</th>
+          </tr>
+          {% endblock %}
+        </thead>
+        <tbody>
+          {%block table_body %}
+          <tr>
+            <th scope="row">1</th>
+            <td>Mark</td>
+            <td>Otto</td>
+            <td>@mdo</td>
+            <td>
+              <button class="btn btn-sm btn-success me-2">
+                <i class="bi bi-pencil"></i>
+              </button>
+              <button class="btn btn-sm btn-danger">
+                <i class="bi bi-trash"></i>
+              </button>
+            </td>
+          </tr>
+          <tr>
+            <th scope="row">2</th>
+            <td>Jacob</td>
+            <td>Thornton</td>
+            <td>@fat</td>
+          </tr>
+          <tr>
+            <th scope="row">3</th>
+            <td>John</td>
+            <td>Doe</td>
+            <td>@social</td>
+          </tr>
+          {% endblock %}
+        </tbody>
+      </table>
+
+      <nav>
+        <ul
+          class="pagination justify-content-center"
+          id="{% block pagination_id%} default-pagination {%endblock%}"
+        >
+          {% block pagination_items %}
+          <li class="page-item disabled">
+            <a class="page-link" href="#"> Previous</a>
+          </li>
+          <li class="page-item active">
+            <a class="page-link" href="#">1</a>
+          </li>
+          <li class="page-item">
+            <a class="page-link" href="#">2</a>
+          </li>
+          <li class="page-item">
+            <a class="page-link" href="#">3</a>
+          </li>
+          <li class="page-item">
+            <a class="page-link" href="#">next</a>
+          </li>
+          {%endblock%}
+        </ul>
+      </nav>
+    </div>
+  </div>
+</div>
+{%block modals %} {%endblock%}
+
+<!-- Table Utilities (Search & Sort) -->
+<script src="{{ url_for('static', filename='js/table-utils.js') }}"></script>
+
+{%endblock%}

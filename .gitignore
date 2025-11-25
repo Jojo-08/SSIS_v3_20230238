@@ -1,1 +1,4 @@
 .env
+update_foreign_keys.sql
+add_email_to_users.sql
+add_photo_to_students.sql

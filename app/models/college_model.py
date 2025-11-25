@@ -23,14 +23,14 @@ class College:
         conn = get_db()
         cur = conn.cursor()
         cur.execute("SELECT COUNT(*) as count FROM colleges")
-        total = cur.fetchone()[0]
+        total = cur.fetchone()['count']
         cur.close()
         return total
 
     def get_college(college_code):
         conn = get_db()
         cur = conn.cursor()
-        cur.execute("SELECT * FROM colleges WHERE college_code = %s", (college_code))
+        cur.execute("SELECT * FROM colleges WHERE college_code = %s", (college_code,))
         college = cur.fetchone()
         cur.close()
         return college
@@ -50,25 +50,25 @@ class College:
         except Exception as e:
             conn.rollback()
             print(f"Error adding college: {e}")
-            return False, f"Error adding college: {e}"
+            return False
         finally:
             cur.close()
 
-    def edit_college(self,college_code):
+    def edit_college(self, old_college_code):
         conn = get_db()
         cur = conn.cursor()
         try:
             cur.execute("""UPDATE colleges 
                         SET college_code = %s, college_name = %s
                         WHERE college_code = %s""",
-                        (college_code,self.college_name,self.college_code))
+                        (self.college_code, self.college_name, old_college_code))
             
             if cur.rowcount == 0:
                 conn.commit()
-                print(f"No college was found with code = {self.college_code}")
-                return False, f"No college was found with code = {self.college_code}"
+                print(f"No college was found with code = {old_college_code}")
+                return False, f"No college was found with code = {old_college_code}"
             conn.commit()
-            return True
+            return True, "College updated successfully"
         
         except Exception as e:
             conn.rollback()
@@ -81,7 +81,7 @@ class College:
         conn = get_db()
         cur = conn.cursor()
         try: 
-            cur.execute("DELETE FROM colleges WHERE college_code = %s",(college_code))
+            cur.execute("DELETE FROM colleges WHERE college_code = %s",(college_code,))
             if cur.rowcount == 0:
                 conn.commit()
                 print(f"No college was found with code = {college_code}")

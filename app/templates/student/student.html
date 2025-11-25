@@ -1,0 +1,90 @@
+{% extends 'layout/entity_templates.html' %} {% block title %} Students
+{%endblock %} {% block header1 %}
+<h2>Students</h2>
+{%endblock%} {% block paragraph %}
+<p>Manage your Students and their Information</p>
+{% endblock %} {% block header2%}
+<h5 class="card-title">Students({{Total}})</h5>
+{% endblock %} {% block table_id %}student-table{% endblock %} {% block
+modal_target %}addStudentModal{% endblock %} {% block table_head %}
+<tr>
+  <th>Photo</th>
+  <th>Student ID</th>
+  <th>First Name</th>
+  <th>Last Name</th>
+  <th>Program</th>
+  <th>Year</th>
+  <th>Gender</th>
+  <th>Actions</th>
+</tr>
+{%endblock%} {% block table_body %} {% for s in students %}
+<tr>
+  <td>
+    <div
+      class="d-flex justify-content-center align-items-center"
+      style="width: 50px; height: 50px"
+    >
+      {% if s['photo_url'] %}
+      <img
+        src="{{ s['photo_url'] }}"
+        alt="Student Photo"
+        class="rounded"
+        style="width: 50px; height: 50px; object-fit: cover"
+      />
+      {% else %}
+      <div
+        class="bg-secondary text-white d-flex justify-content-center align-items-center rounded"
+        style="width: 50px; height: 50px"
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="24"
+          height="24"
+          fill="currentColor"
+          class="bi bi-person"
+          viewBox="0 0 16 16"
+        >
+          <path
+            d="M8 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6m2-3a2 2 0 1 1-4 0 2 2 0 0 1 4 0m4 8c0 1-1 1-1 1H3s-1 0-1-1 1-4 6-4 6 3 6 4m-1-.004c-.001-.246-.154-.986-.832-1.664C11.516 10.68 10.289 10 8 10s-3.516.68-4.168 1.332c-.678.678-.83 1.418-.832 1.664z"
+          />
+        </svg>
+      </div>
+      {% endif %}
+    </div>
+  </td>
+  <td>{{s['student_id']}}</td>
+  <td>{{s['firstname']}}</td>
+  <td>{{s['lastname']}}</td>
+  <td>{{s['program_code']}}</td>
+  <td>{{s['year']}}</td>
+  <td>{{s['gender']}}</td>
+  <td>
+    <button
+      class="btn btn-sm btn-success"
+      data-bs-toggle="modal"
+      data-bs-target="#editStudentModal-{{s['student_id']}}"
+    >
+      <i class="bi bi-pencil"> </i>
+    </button>
+
+    <button
+      type="button"
+      class="btn btn-sm btn-danger delete-btn"
+      data-delete-url="{{ url_for('Student.delete_student', student_id=s['student_id']) }}"
+      data-item-name="student {{ s['student_id'] }}"
+    >
+      <i class="bi bi-trash"></i>
+    </button>
+  </td>
+</tr>
+{%endfor%} {% endblock %} {% block pagination_id %} student-pagination
+{%endblock%} {% block pagination_items %} {%endblock%} {%block modals%} {% set
+modal_id = 'addStudentModal' %} {% set entity_name = 'Student' %} {% set
+modal_title = 'Add Student' %} {% set action_url = url_for('Student.add') %} {%
+set form = add_form %} {% set current_photo_url = None %} {% include
+'layout/form_modal.html' %} {% for s, form in student_forms %} {% set modal_id =
+'editStudentModal-' + s['student_id'] %} {% set entity_name = 'Student' %} {%
+set modal_title = 'Edit Student' %} {% set action_url =
+url_for('Student.edit_student', student_id=s['student_id']) %} {% set
+current_photo_url = s['photo_url'] %} {% include 'layout/form_modal.html' %} {%
+endfor %} {%endblock%}

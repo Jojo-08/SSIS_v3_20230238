@@ -23,14 +23,14 @@ class Program:
         conn = get_db()
         cur = conn.cursor()
         cur.execute("SELECT COUNT(*) as count FROM programs")
-        total = cur.fetchone()[0]
+        total = cur.fetchone()['count']
         cur.close()
         return total
 
     def get_program(program_code):
         conn = get_db()
         cur = conn.cursor()
-        cur.execute("SELECT * FROM programs WHERE program_code = %s", (program_code))
+        cur.execute("SELECT * FROM programs WHERE program_code = %s", (program_code,))
         program = cur.fetchone()
         cur.close()
         return program
@@ -50,25 +50,25 @@ class Program:
         except Exception as e:
             conn.rollback()
             print(f"Error adding program: {e}")
-            return False, f"Error adding program: {e}"
+            return False
         finally:
             cur.close()
 
-    def edit_program(self,program_code):
+    def edit_program(self, old_program_code):
         conn = get_db()
         cur = conn.cursor()
         try:
             cur.execute("""UPDATE programs 
                         SET program_code = %s, program_name = %s, college_code = %s
                         WHERE program_code = %s""",
-                        (program_code,self.program_name,self.college_code,self.program_code))
+                        (self.program_code, self.program_name, self.college_code, old_program_code))
             
             if cur.rowcount == 0:
                 conn.commit()
-                print(f"No program was found with code = {self.program_code}")
-                return False, f"No program was found with code = {self.program_code}"
+                print(f"No program was found with code = {old_program_code}")
+                return False, f"No program was found with code = {old_program_code}"
             conn.commit()
-            return True
+            return True, "Program updated successfully"
         
         except Exception as e:
             conn.rollback()
@@ -81,7 +81,7 @@ class Program:
         conn = get_db()
         cur = conn.cursor()
         try: 
-            cur.execute("DELETE FROM programs WHERE program_code = %s",(program_code))
+            cur.execute("DELETE FROM programs WHERE program_code = %s",(program_code,))
             if cur.rowcount == 0:
                 conn.commit()
                 print(f"No program was found with code = {program_code}")

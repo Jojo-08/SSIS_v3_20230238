@@ -1,0 +1,40 @@
+{% extends "layout/base.html" %} {% block title %} Login {% endblock %} {% block
+content %}
+<div class="container mt-5" style="max-width: 400px">
+  <div class="card shadow">
+    <div class="card-body p-4">
+      <h2 class="text-center mb-4">Login</h2>
+      <form method="POST">
+        {{ form.hidden_tag() }}
+
+        <div class="mb-3">
+          {{ form.username.label(class="form-label") }} {{
+          form.username(class="form-control", placeholder="Enter username") }}
+        </div>
+
+        <div class="mb-3">
+          {{ form.password.label(class="form-label") }} {{
+          form.password(class="form-control", placeholder="Enter password") }}
+        </div>
+
+        <div class="form-check mb-3">
+          {{ form.remember_me(class="form-check-input") }} {{
+          form.remember_me.label(class="form-check-label") }}
+        </div>
+
+        {{ form.submit(class="btn btn-primary w-100") }} {% with messages =
+        get_flashed_messages(with_categories=true) %} {% if messages %} {% for
+        category, message in messages %}
+        <div class="alert alert-{{ category }} mt-3">{{ message }}</div>
+        {% endfor %} {% endif %} {% endwith %}
+      </form>
+
+      <hr class="my-4" />
+      <p class="text-center mb-0">
+        Don't have an account?
+        <a href="{{ url_for('User.sign_up') }}">Sign up here</a>
+      </p>
+    </div>
+  </div>
+</div>
+{% endblock %}

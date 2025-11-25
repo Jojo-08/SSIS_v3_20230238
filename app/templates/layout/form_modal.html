@@ -1,0 +1,167 @@
+<style>
+  .upload-dropzone {
+    border: 2px dashed #dee2e6;
+    border-radius: 0.375rem;
+    padding: 2rem;
+    text-align: center;
+    cursor: pointer;
+    position: relative;
+    background-color: #f8f9fa;
+    transition: all 0.2s ease;
+  }
+  .upload-dropzone:hover {
+    border-color: #0d6efd;
+    background-color: #e9ecef;
+  }
+  .upload-input {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    cursor: pointer;
+    z-index: 10;
+  }
+  .preview-image {
+    max-width: 100%;
+    max-height: 150px;
+    margin-top: 1rem;
+    border-radius: 0.25rem;
+    display: none;
+    object-fit: contain;
+  }
+  .preview-image.show {
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  /* Bootstrap validation styling */
+  .was-validated .form-control:invalid,
+  .was-validated .form-select:invalid {
+    border-color: #dc3545;
+  }
+  .was-validated .form-control:valid,
+  .was-validated .form-select:valid {
+    border-color: #198754;
+  }
+</style>
+
+<div
+  class="modal fade"
+  id="{{ modal_id }}"
+  tabindex="-1"
+  aria-labelledby="{{ modal_id }}Label"
+>
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <form
+        method="POST"
+        action="{{ action_url }}"
+        enctype="multipart/form-data"
+        class="ajax-form needs-validation"
+        data-modal-id="{{ modal_id }}"
+        novalidate
+      >
+        {{ form.hidden_tag() }}
+        <div class="modal-header">
+          <h5 class="modal-title" id="{{ modal_id }}Label">
+            {{ modal_title or ('Add ' + entity_name) }}
+          </h5>
+          <button
+            type="button"
+            class="btn-close"
+            data-bs-dismiss="modal"
+            aria-label="Close"
+          ></button>
+        </div>
+
+        <div class="modal-body">
+          {% for field in form %} {% if field.type not in ['CSRFTokenField',
+          'SubmitField'] %} {% if field.name == 'photo' %}
+          <div class="mb-3">
+            {{ field.label(class="form-label") }}
+            <div class="upload-dropzone">
+              {{ field(class="upload-input", onchange="previewImage(this,
+              'preview-" ~ modal_id ~ "')") }}
+              <div class="upload-content">
+                <i class="bi bi-cloud-upload fs-1 text-muted"></i>
+                <p class="mb-0 text-muted">Drag & Drop or Click to Upload</p>
+
+                <img
+                  id="preview-{{ modal_id }}"
+                  src="{{ current_photo_url if current_photo_url else '' }}"
+                  class="preview-image {{ 'show' if current_photo_url else '' }}"
+                  alt="Photo Preview"
+                />
+              </div>
+            </div>
+            {% for error in field.errors %}
+            <div class="text-danger small">{{ error }}</div>
+            {% endfor %}
+          </div>
+          {% elif field.name == 'student_id' %}
+          <div class="mb-3">
+            {{ field.label(class="form-label") }} {% if 'Edit' in modal_title %}
+            {{ field(class="form-control", readonly=true,
+            style="background-color: #e9ecef;") }}
+            <small class="text-muted">Student ID cannot be changed</small>
+            {% else %} {{ field(class="form-control", required=true,
+            pattern="^\\d{4}-\\d{4}$", placeholder="YYYY-NNNN") }}
+            <div class="invalid-feedback">
+              Please enter a valid Student ID (format: YYYY-NNNN)
+            </div>
+            {% endif %}
+          </div>
+          {% elif field.type == 'SelectField' %}
+          <div class="mb-3">
+            {{ field.label(class="form-label") }} {{ field(class="form-select",
+            required=true) }}
+            <div class="invalid-feedback">Please select an option.</div>
+          </div>
+          {% else %}
+          <div class="mb-3">
+            {{ field.label(class="form-label") }} {{ field(class="form-control",
+            required=true) }}
+            <div class="invalid-feedback">This field is required.</div>
+          </div>
+          {% endif %} {% endif %} {% endfor %}
+        </div>
+
+        <div class="modal-footer">
+          <button
+            type="button"
+            class="btn btn-secondary"
+            data-bs-dismiss="modal"
+          >
+            Cancel
+          </button>
+          <button type="submit" class="btn btn-primary">
+            <span class="submit-text"
+              >{{ form.submit.label.text if form.submit else 'Save' }}</span
+            >
+            <span
+              class="spinner-border spinner-border-sm d-none"
+              role="status"
+              aria-hidden="true"
+            ></span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script>
+  function previewImage(input, previewId) {
+    const preview = document.getElementById(previewId);
+    if (input.files && input.files[0]) {
+      const reader = new FileReader();
+      reader.onload = function (e) {
+        preview.src = e.target.result;
+        preview.classList.add("show");
+      };
+      reader.readAsDataURL(input.files[0]);
+    }
+  }
+</script>

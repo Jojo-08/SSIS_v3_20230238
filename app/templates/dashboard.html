@@ -1,1 +1,9 @@
-{% extends "base.html" %}
+{%extends "layout/base.html" %}
+
+{% block title %} Dashboard - Student Information System {% endblock %}
+
+{% block content %}
+    <h2>Welcome {{current_user.username}}</h2>
+    <p></p>
+    
+{% endblock %}

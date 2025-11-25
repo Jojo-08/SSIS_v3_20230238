@@ -1,0 +1,50 @@
+{% extends 'layout/entity_templates.html' %} {% block title %} Programs {%
+endblock %} {% block header1 %}
+<h2>Programs</h2>
+{%endblock%} {% block paragraph %}
+<p>Manage your Programs and their Information</p>
+{% endblock %} {% block header2%}
+<h5 class="card-title">Programs({{Total}})</h5>
+{% endblock %} {% block label %} Program {% endblock %} {% block table_id
+%}program-table{% endblock %} {% block modal_target%}addProgramModal{%endblock%}
+{% block table_head %}
+<tr>
+  <th>Program Code</th>
+  <th>Program Name</th>
+  <th>College Code</th>
+  <th>Actions</th>
+</tr>
+{%endblock%} {% block table_body %} {% for p in programs %}
+<tr>
+  <td>{{p['program_code']}}</td>
+  <td>{{p['program_name']}}</td>
+  <td>{{p['college_code']}}</td>
+  <td>
+    <button
+      class="btn btn-sm btn-success"
+      data-bs-toggle="modal"
+      data-bs-target="#editProgramModal-{{p['program_code']}}"
+    >
+      <i class="bi bi-pencil"> </i>
+    </button>
+
+    <button
+      type="button"
+      class="btn btn-sm btn-danger delete-btn"
+      data-delete-url="{{ url_for('Program.delete_program', program_code=p['program_code']) }}"
+      data-item-name="program {{ p['program_code'] }}"
+    >
+      <i class="bi bi-trash"></i>
+    </button>
+  </td>
+</tr>
+{%endfor%} {% endblock %} {% block pagination_id %} program-pagination
+{%endblock%} {% block pagination_items %} {%endblock%} {%block modals%} {% set
+modal_id = 'addProgramModal' %} {% set entity_name = 'Program' %} {% set
+modal_title = 'Add Program' %} {% set action_url = url_for('Program.add') %} {%
+set form = add_form %} {% include 'layout/form_modal.html' %} {% for p, form in
+program_forms %} {% set modal_id = 'editProgramModal-' ~ p['program_code'] %} {%
+set entity_name = 'Program' %} {% set modal_title = 'Edit Program - ' ~
+p['program_code'] %} {% set action_url = url_for('Program.edit_program',
+program_code=p['program_code']) %} {% include 'layout/form_modal.html' %} {%
+endfor %} {%endblock%}
