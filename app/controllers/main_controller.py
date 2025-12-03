@@ -4,11 +4,6 @@ from . import main_bp
 
 @main_bp.route('/')
 @login_required
-def dashboard():
-    return render_template('dashboard.html',title='Dashboard')
-
-@main_bp.route('/settings')
-@login_required
-def settings():
-    return render_template('settings.html',title='Settings')
+def index():
+    return redirect(url_for('Student.list_students'))
 
