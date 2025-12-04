@@ -75,9 +75,9 @@ class College:
             if cur.rowcount == 0:
                 conn.commit()
                 print(f"No college was found with code = {old_college_code}")
-                return False, f"No college was found with code = {old_college_code}"
+                return False, f"No college was found with code: {old_college_code}"
             conn.commit()
-            return True, "College updated successfully"
+            return True, "College updated successfully!"
         
         except Exception as e:
             conn.rollback()
@@ -94,9 +94,9 @@ class College:
             if cur.rowcount == 0:
                 conn.commit()
                 print(f"No college was found with code = {college_code}")
-                return False, f"No college was found with code = {college_code}"
+                return False, f"No college was found with code: {college_code}"
             conn.commit()
-            return True, "College deleted successfully"
+            return True, "College deleted successfully!"
         except Exception as e:
             conn.rollback()
             print(f"Error deleting college: {e}")

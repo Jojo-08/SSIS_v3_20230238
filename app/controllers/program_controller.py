@@ -63,21 +63,21 @@ def add():
             if success:
                 if is_ajax:
                     return jsonify({'success': True, 'message': 'Program added successfully!'})
-                flash("Program added Successfully!", "success")
+                flash("Program added successfully!", "success")
                 return redirect(url_for('Program.list_programs'))
             else:
                 if is_ajax:
                     return jsonify({'success': False, 'error': 'Failed to add program. Program code may already exist.'}), 400
-                flash("Failed to add program.", "danger")
+                flash("Failed to add program. Program code may already exist.", "danger")
         
         except ValueError as ve:
             if is_ajax:
                 return jsonify({'success': False, 'error': str(ve)}), 400
-            flash(str(ve),"danger")
+            flash(str(ve), "danger")
         except Exception as e:
             if is_ajax:
                 return jsonify({'success': False, 'error': str(e)}), 400
-            flash(f"Error {e}","danger")
+            flash(f"Error: {e}", "danger")
     else:
         errors = {field: errors for field, errors in form.errors.items()}
         if is_ajax:

@@ -75,9 +75,9 @@ class Program:
             if cur.rowcount == 0:
                 conn.commit()
                 print(f"No program was found with code = {old_program_code}")
-                return False, f"No program was found with code = {old_program_code}"
+                return False, f"No program was found with code: {old_program_code}"
             conn.commit()
-            return True, "Program updated successfully"
+            return True, "Program updated successfully!"
         
         except Exception as e:
             conn.rollback()
@@ -94,9 +94,9 @@ class Program:
             if cur.rowcount == 0:
                 conn.commit()
                 print(f"No program was found with code = {program_code}")
-                return False, f"No program was found with code = {program_code}"
+                return False, f"No program was found with code: {program_code}"
             conn.commit()
-            return True, "Program deleted successfully"
+            return True, "Program deleted successfully!"
         except Exception as e:
             conn.rollback()
             print(f"Error deleting program: {e}")

@@ -32,7 +32,7 @@ def login():
 @user_bp.route('/logout')
 def logout():
     logout_user()
-    flash('you have been logged out','info')
+    flash('You have been logged out.', 'info')
     return redirect(url_for('User.login'))
 
 @user_bp.route('/sign_up', methods=['GET','POST'])

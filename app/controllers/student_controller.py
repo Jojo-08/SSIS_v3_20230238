@@ -163,21 +163,21 @@ def add():
             if success:
                 if is_ajax:
                     return jsonify({'success': True, 'message': 'Student added successfully!'})
-                flash("Student added Successfully!", "success")
+                flash("Student added successfully!", "success")
                 return redirect(url_for('Student.list_students'))
             else:
                 if is_ajax:
                     return jsonify({'success': False, 'error': 'Failed to add student. Student ID may already exist.'}), 400
-                flash("Failed to add student.", "danger")
+                flash("Failed to add student. Student ID may already exist.", "danger")
         
         except ValueError as ve:
             if is_ajax:
                 return jsonify({'success': False, 'error': str(ve)}), 400
-            flash(str(ve),"danger")
+            flash(str(ve), "danger")
         except Exception as e:
             if is_ajax:
                 return jsonify({'success': False, 'error': str(e)}), 400
-            flash(f"Error {e}","danger")
+            flash(f"Error: {e}", "danger")
     else:
         errors = {field: errors for field, errors in form.errors.items()}
         if is_ajax:

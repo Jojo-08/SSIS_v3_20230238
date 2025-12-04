@@ -84,9 +84,9 @@ class Student:
             if cur.rowcount == 0:
                 conn.commit()
                 print(f"No student was found with ID = {self.student_id}")
-                return False, f"No student was found with ID = {self.student_id}"
+                return False, f"No student was found with ID: {self.student_id}"
             conn.commit()
-            return True, "Student updated successfully"
+            return True, "Student updated successfully!"
         
         except Exception as e:
             conn.rollback()
@@ -103,9 +103,9 @@ class Student:
             if cur.rowcount == 0:
                 conn.commit()
                 print(f"No student was found with ID = {student_id}")
-                return False, f"No student was found with ID = {student_id}"
+                return False, f"No student was found with ID: {student_id}"
             conn.commit()
-            return True, "Student deleted successfully"
+            return True, "Student deleted successfully!"
         except Exception as e:
             conn.rollback()
             print(f"Error deleting student: {e}")
