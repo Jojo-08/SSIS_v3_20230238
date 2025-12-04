@@ -77,14 +77,12 @@ modal_target %}addStudentModal{% endblock %} {% block table_head %}
     </button>
   </td>
 </tr>
-{%endfor%} {% endblock %} {% block pagination_id %} student-pagination
-{%endblock%} {% block pagination_items %} {%endblock%} {%block modals%} {% set
-modal_id = 'addStudentModal' %} {% set entity_name = 'Student' %} {% set
-modal_title = 'Add Student' %} {% set action_url = url_for('Student.add') %} {%
-set form = add_form %} {% set current_photo_url = None %} {% include
-'layout/form_modal.html' %} {% for s, form in student_forms %} {% set modal_id =
-'editStudentModal-' + s['student_id'] %} {% set entity_name = 'Student' %} {%
-set modal_title = 'Edit Student' %} {% set action_url =
-url_for('Student.edit_student', student_id=s['student_id']) %} {% set
-current_photo_url = s['photo_url'] %} {% include 'layout/form_modal.html' %} {%
-endfor %} {%endblock%}
+{%endfor%} {% endblock %} {%block modals%} {% set modal_id = 'addStudentModal'
+%} {% set entity_name = 'Student' %} {% set modal_title = 'Add Student' %} {%
+set action_url = url_for('Student.add') %} {% set form = add_form %} {% set
+current_photo_url = None %} {% include 'layout/form_modal.html' %} {% for s,
+form in student_forms %} {% set modal_id = 'editStudentModal-' + s['student_id']
+%} {% set entity_name = 'Student' %} {% set modal_title = 'Edit Student' %} {%
+set action_url = url_for('Student.edit_student', student_id=s['student_id']) %}
+{% set current_photo_url = s['photo_url'] %} {% include 'layout/form_modal.html'
+%} {% endfor %} {%endblock%}

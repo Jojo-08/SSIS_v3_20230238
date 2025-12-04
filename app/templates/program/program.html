@@ -38,13 +38,11 @@ endblock %} {% block header1 %}
     </button>
   </td>
 </tr>
-{%endfor%} {% endblock %} {% block pagination_id %} program-pagination
-{%endblock%} {% block pagination_items %} {%endblock%} {%block modals%} {% set
-modal_id = 'addProgramModal' %} {% set entity_name = 'Program' %} {% set
-modal_title = 'Add Program' %} {% set action_url = url_for('Program.add') %} {%
-set form = add_form %} {% include 'layout/form_modal.html' %} {% for p, form in
-program_forms %} {% set modal_id = 'editProgramModal-' ~ p['program_code'] %} {%
-set entity_name = 'Program' %} {% set modal_title = 'Edit Program - ' ~
-p['program_code'] %} {% set action_url = url_for('Program.edit_program',
-program_code=p['program_code']) %} {% include 'layout/form_modal.html' %} {%
-endfor %} {%endblock%}
+{%endfor%} {% endblock %} {%block modals%} {% set modal_id = 'addProgramModal'
+%} {% set entity_name = 'Program' %} {% set modal_title = 'Add Program' %} {%
+set action_url = url_for('Program.add') %} {% set form = add_form %} {% include
+'layout/form_modal.html' %} {% for p, form in program_forms %} {% set modal_id =
+'editProgramModal-' ~ p['program_code'] %} {% set entity_name = 'Program' %} {%
+set modal_title = 'Edit Program - ' ~ p['program_code'] %} {% set action_url =
+url_for('Program.edit_program', program_code=p['program_code']) %} {% include
+'layout/form_modal.html' %} {% endfor %} {%endblock%}
