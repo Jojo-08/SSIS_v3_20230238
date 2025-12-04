@@ -96,7 +96,7 @@ class College:
                 print(f"No college was found with code = {college_code}")
                 return False, f"No college was found with code = {college_code}"
             conn.commit()
-            return True
+            return True, "College deleted successfully"
         except Exception as e:
             conn.rollback()
             print(f"Error deleting college: {e}")

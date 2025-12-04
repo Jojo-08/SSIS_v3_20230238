@@ -301,6 +301,34 @@
             var form = modalEl.querySelector("form");
             if (form) {
               form.classList.remove("was-validated");
+              // Reset any server-side validation states
+              form.querySelectorAll(".is-invalid").forEach(function (field) {
+                field.classList.remove("is-invalid");
+              });
+              form.querySelectorAll(".is-valid").forEach(function (field) {
+                field.classList.remove("is-valid");
+              });
+              // Reset invalid feedback display
+              form
+                .querySelectorAll(".invalid-feedback")
+                .forEach(function (feedback) {
+                  feedback.style.display = "";
+                });
+
+              // Reset form fields for "Add" modals only (not Edit modals)
+              var modalTitle = modalEl.querySelector(".modal-title");
+              if (
+                modalTitle &&
+                modalTitle.textContent.trim().startsWith("Add")
+              ) {
+                form.reset();
+                // Also reset any image previews
+                var preview = form.querySelector(".preview-image");
+                if (preview) {
+                  preview.src = "";
+                  preview.classList.remove("show");
+                }
+              }
             }
           });
         });
@@ -399,6 +427,9 @@
               // Error - show toast on top of modal
               var errorMsg = result.data.error || "An error occurred";
 
+              // Remove was-validated to prevent green checkmarks on fields
+              form.classList.remove("was-validated");
+
               // If there are field-specific errors, format them
               if (result.data.errors) {
                 var fieldErrors = [];
@@ -406,9 +437,60 @@
                   fieldErrors.push(
                     field + ": " + result.data.errors[field].join(", ")
                   );
+
+                  // Mark the specific field as invalid
+                  var fieldInput = form.querySelector('[name="' + field + '"]');
+                  if (fieldInput) {
+                    fieldInput.classList.add("is-invalid");
+                    fieldInput.classList.remove("is-valid");
+
+                    // Add or update the invalid feedback
+                    var parent = fieldInput.closest(".mb-3");
+                    var feedback = parent
+                      ? parent.querySelector(".invalid-feedback")
+                      : null;
+                    if (feedback) {
+                      feedback.textContent =
+                        result.data.errors[field].join(", ");
+                      feedback.style.display = "block";
+                    }
+                  }
                 }
                 if (fieldErrors.length > 0) {
                   errorMsg = fieldErrors.join("; ");
+                }
+              }
+
+              // If error mentions "already exist" or "duplicate", mark the code field as invalid
+              if (
+                errorMsg.toLowerCase().includes("already exist") ||
+                errorMsg.toLowerCase().includes("duplicate") ||
+                errorMsg.toLowerCase().includes("may already")
+              ) {
+                var firstCodeField = form.querySelector(
+                  'input[name$="_code"]:not([readonly])'
+                );
+                if (firstCodeField) {
+                  firstCodeField.classList.add("is-invalid");
+                  firstCodeField.classList.remove("is-valid");
+
+                  // Find or create the invalid feedback message
+                  var parent = firstCodeField.closest(".mb-3");
+                  var feedback = parent
+                    ? parent.querySelector(".invalid-feedback")
+                    : null;
+
+                  if (feedback) {
+                    feedback.textContent = "This code already exists.";
+                    feedback.style.display = "block";
+                  } else {
+                    // Create feedback element if it doesn't exist
+                    var newFeedback = document.createElement("div");
+                    newFeedback.className = "invalid-feedback";
+                    newFeedback.textContent = "This code already exists.";
+                    newFeedback.style.display = "block";
+                    firstCodeField.parentNode.appendChild(newFeedback);
+                  }
                 }
               }
 

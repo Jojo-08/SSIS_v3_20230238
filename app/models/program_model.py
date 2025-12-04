@@ -96,7 +96,7 @@ class Program:
                 print(f"No program was found with code = {program_code}")
                 return False, f"No program was found with code = {program_code}"
             conn.commit()
-            return True
+            return True, "Program deleted successfully"
         except Exception as e:
             conn.rollback()
             print(f"Error deleting program: {e}")
