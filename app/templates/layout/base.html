@@ -427,69 +427,94 @@
               // Error - show toast on top of modal
               var errorMsg = result.data.error || "An error occurred";
 
-              // Remove was-validated to prevent green checkmarks on fields
+              // Remove was-validated so our manual is-valid/is-invalid classes take precedence
               form.classList.remove("was-validated");
 
-              // If there are field-specific errors, format them
+              // Collect all fields that have errors from server
+              var errorFields = {};
               if (result.data.errors) {
-                var fieldErrors = [];
                 for (var field in result.data.errors) {
-                  fieldErrors.push(
-                    field + ": " + result.data.errors[field].join(", ")
-                  );
+                  errorFields[field] = result.data.errors[field];
+                }
+              }
 
-                  // Mark the specific field as invalid
-                  var fieldInput = form.querySelector('[name="' + field + '"]');
-                  if (fieldInput) {
-                    fieldInput.classList.add("is-invalid");
-                    fieldInput.classList.remove("is-valid");
+              // Get all form inputs and mark them as valid or invalid
+              var allInputs = form.querySelectorAll(
+                'input:not([type="hidden"]):not([readonly]), select, textarea'
+              );
+              allInputs.forEach(function (input) {
+                var fieldName = input.getAttribute("name");
+                var parent = input.closest(".mb-3");
+                var feedback = parent
+                  ? parent.querySelector(".invalid-feedback")
+                  : null;
 
-                    // Add or update the invalid feedback
-                    var parent = fieldInput.closest(".mb-3");
-                    var feedback = parent
-                      ? parent.querySelector(".invalid-feedback")
-                      : null;
-                    if (feedback) {
-                      feedback.textContent =
-                        result.data.errors[field].join(", ");
-                      feedback.style.display = "block";
-                    }
+                // Check if this field has an error
+                if (errorFields[fieldName]) {
+                  // Mark as invalid
+                  input.classList.add("is-invalid");
+                  input.classList.remove("is-valid");
+
+                  // Show error message
+                  if (feedback) {
+                    feedback.textContent = errorFields[fieldName].join(", ");
+                    feedback.style.display = "block";
                   }
+                } else if (input.value.trim() !== "" && input.checkValidity()) {
+                  // Mark as valid if it has a value and passes HTML5 validation
+                  input.classList.add("is-valid");
+                  input.classList.remove("is-invalid");
+
+                  // Hide any existing error feedback
+                  if (feedback) {
+                    feedback.style.display = "none";
+                  }
+                }
+              });
+
+              // Build error message from field errors
+              if (Object.keys(errorFields).length > 0) {
+                var fieldErrors = [];
+                for (var field in errorFields) {
+                  fieldErrors.push(
+                    field + ": " + errorFields[field].join(", ")
+                  );
                 }
                 if (fieldErrors.length > 0) {
                   errorMsg = fieldErrors.join("; ");
                 }
               }
 
-              // If error mentions "already exist" or "duplicate", mark the code field as invalid
+              // If error mentions "already exist" or "duplicate", mark the code/id field as invalid
               if (
                 errorMsg.toLowerCase().includes("already exist") ||
                 errorMsg.toLowerCase().includes("duplicate") ||
                 errorMsg.toLowerCase().includes("may already")
               ) {
-                var firstCodeField = form.querySelector(
-                  'input[name$="_code"]:not([readonly])'
-                );
-                if (firstCodeField) {
-                  firstCodeField.classList.add("is-invalid");
-                  firstCodeField.classList.remove("is-valid");
+                // Try to find a code field first, then an id field
+                var duplicateField =
+                  form.querySelector('input[name$="_code"]:not([readonly])') ||
+                  form.querySelector('input[name$="_id"]:not([readonly])');
+                if (duplicateField) {
+                  duplicateField.classList.add("is-invalid");
+                  duplicateField.classList.remove("is-valid");
 
                   // Find or create the invalid feedback message
-                  var parent = firstCodeField.closest(".mb-3");
+                  var parent = duplicateField.closest(".mb-3");
                   var feedback = parent
                     ? parent.querySelector(".invalid-feedback")
                     : null;
 
                   if (feedback) {
-                    feedback.textContent = "This code already exists.";
+                    feedback.textContent = "This already exists.";
                     feedback.style.display = "block";
                   } else {
                     // Create feedback element if it doesn't exist
                     var newFeedback = document.createElement("div");
                     newFeedback.className = "invalid-feedback";
-                    newFeedback.textContent = "This code already exists.";
+                    newFeedback.textContent = "This already exists.";
                     newFeedback.style.display = "block";
-                    firstCodeField.parentNode.appendChild(newFeedback);
+                    duplicateField.parentNode.appendChild(newFeedback);
                   }
                 }
               }
