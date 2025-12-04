@@ -1,5 +1,5 @@
-{% extends 'layout/entity_templates.html' %} {% block title %} Colleges {%
-endblock %} {% block header1 %}
+{% extends 'layout/entity_templates.html' %} {% block title %} Colleges
+{%endblock %} {% block header1 %}
 <h2>Colleges</h2>
 {%endblock%} {% block paragraph %}
 <p>Manage your Colleges and their Information</p>
@@ -9,8 +9,24 @@ endblock %} {% block header1 %}
 %}college-table{% endblock %} {% block modal_target%}addCollegeModal{%endblock%}
 {% block table_head %}
 <tr>
-  <th>College Code</th>
-  <th>College Name</th>
+  <th
+    class="sortable {% if sort_by == 'college_code' %}{{ sort_order }}{% endif %}"
+  >
+    <a
+      href="?sort_by=college_code&sort_order={% if sort_by == 'college_code' and sort_order == 'asc' %}desc{% else %}asc{% endif %}&page=1"
+      class="text-decoration-none text-dark"
+      >College Code</a
+    >
+  </th>
+  <th
+    class="sortable {% if sort_by == 'college_name' %}{{ sort_order }}{% endif %}"
+  >
+    <a
+      href="?sort_by=college_name&sort_order={% if sort_by == 'college_name' and sort_order == 'asc' %}desc{% else %}asc{% endif %}&page=1"
+      class="text-decoration-none text-dark"
+      >College Name</a
+    >
+  </th>
   <th>Actions</th>
 </tr>
 {%endblock%} {% block table_body %} {% for c in colleges %}

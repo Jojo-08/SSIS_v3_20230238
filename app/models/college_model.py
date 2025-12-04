@@ -10,11 +10,20 @@ class College:
         
   
 
-    def get_all(page=1,per_page=20):
+    def get_all(page=1, per_page=20, sort_by='college_code', sort_order='asc'):
         conn = get_db()
         cur = conn.cursor()
         offset = (page - 1) * per_page
-        cur.execute("SELECT * FROM colleges ORDER by college_code LIMIT %s OFFSET %s",(per_page, offset))
+        
+        # Whitelist allowed columns to prevent SQL injection
+        allowed_columns = ['college_code', 'college_name']
+        if sort_by not in allowed_columns:
+            sort_by = 'college_code'
+        if sort_order not in ['asc', 'desc']:
+            sort_order = 'asc'
+        
+        query = f"SELECT * FROM colleges ORDER BY {sort_by} {sort_order.upper()} LIMIT %s OFFSET %s"
+        cur.execute(query, (per_page, offset))
         colleges = cur.fetchall()
         cur.close()
         return colleges

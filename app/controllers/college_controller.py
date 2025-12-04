@@ -9,7 +9,10 @@ from app.forms import CollegeForm
 def list_colleges():
     page = request.args.get('page',1, type=int)
     per_page = 20
-    colleges = College.get_all(page, per_page)
+    sort_by = request.args.get('sort_by', 'college_code')
+    sort_order = request.args.get('sort_order', 'asc')
+    
+    colleges = College.get_all(page, per_page, sort_by, sort_order)
     total = College.get_total_num()
 
     add_form = CollegeForm()
@@ -26,7 +29,7 @@ def list_colleges():
 
     college_forms = list(zip(colleges, edit_forms))
    
-    return render_template('college/college.html', colleges=colleges, Total=total, page=page, add_form=add_form, college_forms=college_forms, open_modal=open_modal)
+    return render_template('college/college.html', colleges=colleges, Total=total, page=page, per_page=per_page, sort_by=sort_by, sort_order=sort_order, add_form=add_form, college_forms=college_forms, open_modal=open_modal)
 
 @college_bp.route('/add', methods=['POST'])
 @login_required

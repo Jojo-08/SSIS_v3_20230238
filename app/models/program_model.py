@@ -10,11 +10,20 @@ class Program:
         
   
 
-    def get_all(page=1,per_page=20):
+    def get_all(page=1, per_page=20, sort_by='program_code', sort_order='asc'):
         conn = get_db()
         cur = conn.cursor()
         offset = (page - 1) * per_page
-        cur.execute("SELECT * FROM programs ORDER by program_code LIMIT %s OFFSET %s",(per_page, offset))
+        
+        # Whitelist allowed columns to prevent SQL injection
+        allowed_columns = ['program_code', 'program_name', 'college_code']
+        if sort_by not in allowed_columns:
+            sort_by = 'program_code'
+        if sort_order not in ['asc', 'desc']:
+            sort_order = 'asc'
+        
+        query = f"SELECT * FROM programs ORDER BY {sort_by} {sort_order.upper()} LIMIT %s OFFSET %s"
+        cur.execute(query, (per_page, offset))
         programs = cur.fetchall()
         cur.close()
         return programs

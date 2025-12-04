@@ -11,7 +11,10 @@ from app.forms import ProgramForm
 def list_programs():
     page = request.args.get('page',1, type=int)
     per_page = 20
-    programs = Program.get_all(page, per_page)
+    sort_by = request.args.get('sort_by', 'program_code')
+    sort_order = request.args.get('sort_order', 'asc')
+    
+    programs = Program.get_all(page, per_page, sort_by, sort_order)
     total = Program.get_total_num()
 
     # Get all colleges for the dropdown
@@ -35,7 +38,7 @@ def list_programs():
 
     program_forms = list(zip(programs, edit_forms))
    
-    return render_template('program/program.html', programs=programs, Total=total, page=page, add_form=add_form, program_forms=program_forms, open_modal=open_modal)
+    return render_template('program/program.html', programs=programs, Total=total, page=page, per_page=per_page, sort_by=sort_by, sort_order=sort_order, add_form=add_form, program_forms=program_forms, open_modal=open_modal)
 
 @program_bp.route('/add', methods=['POST'])
 @login_required

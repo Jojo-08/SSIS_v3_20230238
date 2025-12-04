@@ -65,7 +65,10 @@ def upload_resized_image(photo, student_id):
 def list_students():
     page = request.args.get('page', 1, type=int)
     per_page = 20
-    students = Student.get_all(page, per_page)
+    sort_by = request.args.get('sort_by', 'student_id')
+    sort_order = request.args.get('sort_order', 'asc')
+    
+    students = Student.get_all(page, per_page, sort_by, sort_order)
     total = Student.get_total_num()
 
     # Generate signed URLs for private access
@@ -113,7 +116,7 @@ def list_students():
     open_modal =request.args.get('open_modal')
 
     student_forms = list(zip(students,edit_forms))
-    return render_template('student/student.html', Total=total, page=page, add_form=add_form, student_forms=student_forms, students=students, open_modal=open_modal)
+    return render_template('student/student.html', Total=total, page=page, per_page=per_page, sort_by=sort_by, sort_order=sort_order, add_form=add_form, student_forms=student_forms, students=students, open_modal=open_modal)
 
 @student_bp.route('/add', methods=['POST'])
 @login_required

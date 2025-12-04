@@ -9,12 +9,56 @@
 modal_target %}addStudentModal{% endblock %} {% block table_head %}
 <tr>
   <th>Photo</th>
-  <th>Student ID</th>
-  <th>First Name</th>
-  <th>Last Name</th>
-  <th>Program</th>
-  <th>Year</th>
-  <th>Gender</th>
+  <th
+    class="sortable {% if sort_by == 'student_id' %}{{ sort_order }}{% endif %}"
+  >
+    <a
+      href="?sort_by=student_id&sort_order={% if sort_by == 'student_id' and sort_order == 'asc' %}desc{% else %}asc{% endif %}&page=1"
+      class="text-decoration-none text-dark"
+      >Student ID</a
+    >
+  </th>
+  <th
+    class="sortable {% if sort_by == 'firstname' %}{{ sort_order }}{% endif %}"
+  >
+    <a
+      href="?sort_by=firstname&sort_order={% if sort_by == 'firstname' and sort_order == 'asc' %}desc{% else %}asc{% endif %}&page=1"
+      class="text-decoration-none text-dark"
+      >First Name</a
+    >
+  </th>
+  <th
+    class="sortable {% if sort_by == 'lastname' %}{{ sort_order }}{% endif %}"
+  >
+    <a
+      href="?sort_by=lastname&sort_order={% if sort_by == 'lastname' and sort_order == 'asc' %}desc{% else %}asc{% endif %}&page=1"
+      class="text-decoration-none text-dark"
+      >Last Name</a
+    >
+  </th>
+  <th
+    class="sortable {% if sort_by == 'program_code' %}{{ sort_order }}{% endif %}"
+  >
+    <a
+      href="?sort_by=program_code&sort_order={% if sort_by == 'program_code' and sort_order == 'asc' %}desc{% else %}asc{% endif %}&page=1"
+      class="text-decoration-none text-dark"
+      >Program</a
+    >
+  </th>
+  <th class="sortable {% if sort_by == 'year' %}{{ sort_order }}{% endif %}">
+    <a
+      href="?sort_by=year&sort_order={% if sort_by == 'year' and sort_order == 'asc' %}desc{% else %}asc{% endif %}&page=1"
+      class="text-decoration-none text-dark"
+      >Year</a
+    >
+  </th>
+  <th class="sortable {% if sort_by == 'gender' %}{{ sort_order }}{% endif %}">
+    <a
+      href="?sort_by=gender&sort_order={% if sort_by == 'gender' and sort_order == 'asc' %}desc{% else %}asc{% endif %}&page=1"
+      class="text-decoration-none text-dark"
+      >Gender</a
+    >
+  </th>
   <th>Actions</th>
 </tr>
 {%endblock%} {% block table_body %} {% for s in students %}

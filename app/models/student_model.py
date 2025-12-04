@@ -19,11 +19,20 @@ class Student:
 
   
 
-    def get_all(page=1,per_page=20):
+    def get_all(page=1, per_page=20, sort_by='student_id', sort_order='asc'):
         conn = get_db()
         cur = conn.cursor()
         offset = (page - 1) * per_page
-        cur.execute("SELECT * FROM students ORDER by student_id LIMIT %s OFFSET %s",(per_page, offset))
+        
+        # Whitelist allowed columns to prevent SQL injection
+        allowed_columns = ['student_id', 'firstname', 'lastname', 'program_code', 'year', 'gender']
+        if sort_by not in allowed_columns:
+            sort_by = 'student_id'
+        if sort_order not in ['asc', 'desc']:
+            sort_order = 'asc'
+        
+        query = f"SELECT * FROM students ORDER BY {sort_by} {sort_order.upper()} LIMIT %s OFFSET %s"
+        cur.execute(query, (per_page, offset))
         students = cur.fetchall()
         cur.close()
         return students
