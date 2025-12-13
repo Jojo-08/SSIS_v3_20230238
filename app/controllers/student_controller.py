@@ -347,9 +347,22 @@ def edit_student(student_id):
 @student_bp.route('/delete/<student_id>', methods=['POST'])
 @login_required
 def delete_student(student_id):
+    # Get student record to retrieve photo path before deletion
+    student = Student.get_student(student_id)
+    photo_path = student['photo_url'] if student else None
+    
     success, message = Student.delete_student(student_id)
 
     if success:
+        # Delete photo from Supabase storage if it exists
+        if photo_path:
+            try:
+                supabase.storage.from_(BUCKET_NAME).remove([photo_path])
+                print(f"Photo deleted from storage: {photo_path}")
+            except Exception as e:
+                print(f"Warning: Could not delete photo from storage: {e}")
+                # Don't fail the deletion if photo removal fails
+        
         flash("Student deleted successfully!", "success")
     else: 
         flash(message, "danger")

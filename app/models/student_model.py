@@ -96,6 +96,7 @@ class Student:
             cur.close()
 
     def delete_student(student_id):
+        # Note: Photo deletion from Supabase storage is handled in the controller
         conn = get_db()
         cur = conn.cursor()
         try: 
