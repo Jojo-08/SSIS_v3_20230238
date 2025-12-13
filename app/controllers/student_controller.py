@@ -18,8 +18,16 @@ def upload_resized_image(photo, student_id):
     """
     Resizes image to max 300x300, preserves PNG/JPEG format, and uploads to Supabase.
     """
-    # 1. Open the image using Pillow
-    img = Image.open(photo)
+    # 1. Validate file is an actual image
+    try:
+        img = Image.open(photo)
+        # Verify it's a real image by loading the data
+        img.verify()
+        # Re-open after verify (verify() closes the file)
+        photo.seek(0)
+        img = Image.open(photo)
+    except Exception as e:
+        raise ValueError("Invalid or corrupted image file. Please upload a valid JPG or PNG image.")
     
     # 2. Determine the format (default to JPEG if unknown)
     # img.format returns 'JPEG', 'PNG', 'GIF', etc.
@@ -130,6 +138,9 @@ def add():
     form = StudentForm()
     form.program_code.choices = program_choices
     
+    # Collect all validation errors
+    validation_errors = {}
+    
     if form.validate():
         student_id = form.student_id.data
         first_name = form.first_name.data
@@ -143,17 +154,42 @@ def add():
 
         if photo and photo.filename:
             try:
+                # Validate file format
+                allowed_extensions = {'jpg', 'jpeg', 'png'}
+                file_ext = photo.filename.rsplit('.', 1)[1].lower() if '.' in photo.filename else ''
+                if file_ext not in allowed_extensions:
+                    validation_errors['photo'] = ['Only JPG, JPEG, and PNG images are allowed.']
+                    raise ValueError("Invalid file format")
+                
+                # Check file size manually (in case request made it through)
+                photo.seek(0, 2)  # Seek to end
+                size = photo.tell()  # Get position (file size)
+                photo.seek(0)  # Reset to beginning
+                
+                # 5MB limit
+                if size > 5 * 1024 * 1024:
+                    validation_errors['photo'] = ['Image file size must be less than 5MB.']
+                    raise ValueError("File size too large")
+                
                 print(f"Processing and uploading photo for {student_id}...")
                 
                 # CALL THE upload_resized_image() FUNCTION HERE
                 photo_url = upload_resized_image(photo, student_id)
                 
                 print(f"Upload successful. Path: {photo_url}")
+            except ValueError as ve:
+                print(f"Validation error: {ve}")
+                if is_ajax:
+                    return jsonify({'success': False, 'errors': validation_errors, 'error': 'Invalid image file.'}), 400
+                flash(validation_errors.get('photo', [str(ve)])[0], "danger")
+                return redirect(url_for('Student.list_students', open_modal='addStudentModal'))
             except Exception as e:
                 print(f"Error uploading photo: {e}")
+                validation_errors['photo'] = [f'Error uploading photo: {str(e)}']
                 if is_ajax:
-                    return jsonify({'success': False, 'error': f"Error uploading photo: {e}"}), 400
+                    return jsonify({'success': False, 'errors': validation_errors, 'error': f"Error uploading photo: {e}"}), 400
                 flash(f"Error uploading photo: {e}", "danger")
+                return redirect(url_for('Student.list_students', open_modal='addStudentModal'))
 
         try:
             new_student = Student(student_id, first_name, last_name, 
@@ -166,8 +202,9 @@ def add():
                 flash("Student added successfully!", "success")
                 return redirect(url_for('Student.list_students'))
             else:
+                validation_errors['student_id'] = ['Student ID may already exist.']
                 if is_ajax:
-                    return jsonify({'success': False, 'error': 'Failed to add student. Student ID may already exist.'}), 400
+                    return jsonify({'success': False, 'errors': validation_errors, 'error': 'Failed to add student. Student ID may already exist.'}), 400
                 flash("Failed to add student. Student ID may already exist.", "danger")
         
         except ValueError as ve:
@@ -179,9 +216,10 @@ def add():
                 return jsonify({'success': False, 'error': str(e)}), 400
             flash(f"Error: {e}", "danger")
     else:
-        errors = {field: errors for field, errors in form.errors.items()}
+        # Collect all form validation errors
+        all_errors = {field: error_list for field, error_list in form.errors.items()}
         if is_ajax:
-            return jsonify({'success': False, 'errors': errors, 'error': 'Validation failed. Please check your input.'}), 400
+            return jsonify({'success': False, 'errors': all_errors, 'error': 'Validation failed. Please check your input.'}), 400
     
     flash("Please fix the errors below.", "danger")
     return redirect(url_for('Student.list_students', open_modal='addStudentModal'))
@@ -206,6 +244,9 @@ def edit_student(student_id):
         flash('Student not found!', 'danger')
         return redirect(url_for('Student.list_students'))
     
+    # Collect all validation errors
+    validation_errors = {}
+    
     if form.validate():
         
         photo = request.files.get('photo')
@@ -213,6 +254,23 @@ def edit_student(student_id):
 
         if photo and photo.filename:
             try:
+                # Validate file format
+                allowed_extensions = {'jpg', 'jpeg', 'png'}
+                file_ext = photo.filename.rsplit('.', 1)[1].lower() if '.' in photo.filename else ''
+                if file_ext not in allowed_extensions:
+                    validation_errors['photo'] = ['Only JPG, JPEG, and PNG images are allowed.']
+                    raise ValueError("Invalid file format")
+                
+                # Check file size manually (in case request made it through)
+                photo.seek(0, 2)  # Seek to end
+                size = photo.tell()  # Get position (file size)
+                photo.seek(0)  # Reset to beginning
+                
+                # 5MB limit
+                if size > 5 * 1024 * 1024:
+                    validation_errors['photo'] = ['Image file size must be less than 5MB.']
+                    raise ValueError("File size too large")
+                
                 print(f"Processing and uploading photo for {student_id}...")
                 
                 # CALL THE upload_resized_image() FUNCTION HERE
@@ -220,11 +278,19 @@ def edit_student(student_id):
                 photo_url = upload_resized_image(photo, student_id)
                 
                 print(f"Upload successful. Path: {photo_url}")
+            except ValueError as ve:
+                print(f"Validation error: {ve}")
+                if is_ajax:
+                    return jsonify({'success': False, 'errors': validation_errors, 'error': 'Invalid image file.'}), 400
+                flash(validation_errors.get('photo', [str(ve)])[0], "danger")
+                return redirect(url_for('Student.list_students', open_modal=f'editStudentModal-{student_id}'))
             except Exception as e:
                 print(f"Error uploading photo: {e}")
+                validation_errors['photo'] = [f'Error uploading photo: {str(e)}']
                 if is_ajax:
-                    return jsonify({'success': False, 'error': f"Error uploading photo: {e}"}), 400
+                    return jsonify({'success': False, 'errors': validation_errors, 'error': f"Error uploading photo: {e}"}), 400
                 flash(f"Error uploading photo: {e}", "danger")
+                return redirect(url_for('Student.list_students', open_modal=f'editStudentModal-{student_id}'))
 
         # If no new photo uploaded, keep the existing one
         if not photo_url:
@@ -259,12 +325,12 @@ def edit_student(student_id):
         return redirect(url_for('Student.list_students'))
     
     # Validation errors
-    errors = {field: errors for field, errors in form.errors.items()}
+    all_errors = {field: error_list for field, error_list in form.errors.items()}
     if is_ajax:
-        return jsonify({'success': False, 'errors': errors, 'error': 'Validation failed. Please check your input.'}), 400
+        return jsonify({'success': False, 'errors': all_errors, 'error': 'Validation failed. Please check your input.'}), 400
     
-    for field, errors in form.errors.items():
-        for error in errors:
+    for field, error_list in form.errors.items():
+        for error in error_list:
             flash(f"{field}: {error}", "danger")
     return redirect(url_for('Student.list_students', open_modal=f'editStudentModal-{student_id}'))
 

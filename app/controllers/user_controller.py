@@ -10,7 +10,7 @@ from app.forms import UserForm, LoginForm
 def login():
     # If user is already logged in, redirect to dashboard
     if current_user.is_authenticated:
-        return redirect(url_for('Main.dashboard'))
+        return redirect(url_for('Student.list_students'))
     
     form = LoginForm()
 
@@ -23,7 +23,7 @@ def login():
             
             # Redirect to next page if it exists, otherwise to dashboard
             next_page = request.args.get('next')
-            return redirect(next_page) if next_page else redirect(url_for('Main.dashboard'))
+            return redirect(next_page) if next_page else redirect(url_for('Student.list_students'))
         else:
             flash('Invalid username or password', 'danger')
             
@@ -39,7 +39,7 @@ def logout():
 def sign_up():
     # If user is already logged in, redirect to dashboard
     if current_user.is_authenticated:
-        return redirect(url_for('Main.dashboard'))
+        return redirect(url_for('Student.list_students'))
     
     form = UserForm()
     if form.validate_on_submit():
