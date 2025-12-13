@@ -18,8 +18,16 @@ def upload_resized_image(photo, student_id):
     """
     Resizes image to max 300x300, preserves PNG/JPEG format, and uploads to Supabase.
     """
-    # 1. Open the image using Pillow
-    img = Image.open(photo)
+    # 1. Validate file is an actual image
+    try:
+        img = Image.open(photo)
+        # Verify it's a real image by loading the data
+        img.verify()
+        # Re-open after verify (verify() closes the file)
+        photo.seek(0)
+        img = Image.open(photo)
+    except Exception as e:
+        raise ValueError("Invalid or corrupted image file. Please upload a valid JPG or PNG image.")
     
     # 2. Determine the format (default to JPEG if unknown)
     # img.format returns 'JPEG', 'PNG', 'GIF', etc.
@@ -143,17 +151,33 @@ def add():
 
         if photo and photo.filename:
             try:
+                # Check file size manually (in case request made it through)
+                photo.seek(0, 2)  # Seek to end
+                size = photo.tell()  # Get position (file size)
+                photo.seek(0)  # Reset to beginning
+                
+                # 5MB limit
+                if size > 5 * 1024 * 1024:
+                    raise ValueError("Image file size must be less than 5MB.")
+                
                 print(f"Processing and uploading photo for {student_id}...")
                 
                 # CALL THE upload_resized_image() FUNCTION HERE
                 photo_url = upload_resized_image(photo, student_id)
                 
                 print(f"Upload successful. Path: {photo_url}")
+            except ValueError as ve:
+                print(f"Validation error: {ve}")
+                if is_ajax:
+                    return jsonify({'success': False, 'error': str(ve)}), 400
+                flash(str(ve), "danger")
+                return redirect(url_for('Student.list_students'))
             except Exception as e:
                 print(f"Error uploading photo: {e}")
                 if is_ajax:
                     return jsonify({'success': False, 'error': f"Error uploading photo: {e}"}), 400
                 flash(f"Error uploading photo: {e}", "danger")
+                return redirect(url_for('Student.list_students'))
 
         try:
             new_student = Student(student_id, first_name, last_name, 
@@ -213,6 +237,15 @@ def edit_student(student_id):
 
         if photo and photo.filename:
             try:
+                # Check file size manually (in case request made it through)
+                photo.seek(0, 2)  # Seek to end
+                size = photo.tell()  # Get position (file size)
+                photo.seek(0)  # Reset to beginning
+                
+                # 5MB limit
+                if size > 5 * 1024 * 1024:
+                    raise ValueError("Image file size must be less than 5MB.")
+                
                 print(f"Processing and uploading photo for {student_id}...")
                 
                 # CALL THE upload_resized_image() FUNCTION HERE
@@ -220,6 +253,12 @@ def edit_student(student_id):
                 photo_url = upload_resized_image(photo, student_id)
                 
                 print(f"Upload successful. Path: {photo_url}")
+            except ValueError as ve:
+                print(f"Validation error: {ve}")
+                if is_ajax:
+                    return jsonify({'success': False, 'error': str(ve)}), 400
+                flash(str(ve), "danger")
+                return redirect(url_for('Student.list_students'))
             except Exception as e:
                 print(f"Error uploading photo: {e}")
                 if is_ajax:

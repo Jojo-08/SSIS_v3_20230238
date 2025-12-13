@@ -13,6 +13,14 @@
     border-color: #0d6efd;
     background-color: #e9ecef;
   }
+  .upload-dropzone.invalid {
+    border-color: #dc3545;
+    background-color: #f8d7da;
+  }
+  .upload-dropzone.valid {
+    border-color: #198754;
+    background-color: #d1e7dd;
+  }
   .upload-input {
     position: absolute;
     top: 0;
@@ -155,13 +163,162 @@
 <script>
   function previewImage(input, previewId) {
     const preview = document.getElementById(previewId);
-    if (input.files && input.files[0]) {
-      const reader = new FileReader();
-      reader.onload = function (e) {
-        preview.src = e.target.result;
-        preview.classList.add("show");
-      };
-      reader.readAsDataURL(input.files[0]);
+    const file = input.files && input.files[0];
+
+    // Get the upload dropzone and feedback elements
+    const dropzone = input.closest(".upload-dropzone");
+    const parentDiv = dropzone.closest(".mb-3");
+    let feedbackDiv = parentDiv.querySelector(".invalid-feedback");
+
+    // Create feedback div if it doesn't exist
+    if (!feedbackDiv) {
+      feedbackDiv = document.createElement("div");
+      feedbackDiv.className = "invalid-feedback";
+      feedbackDiv.style.display = "block";
+      parentDiv.appendChild(feedbackDiv);
     }
+
+    // Clear previous validation states
+    input.classList.remove("is-invalid", "is-valid");
+    dropzone.classList.remove("invalid", "valid");
+    feedbackDiv.textContent = "";
+    feedbackDiv.style.display = "none";
+
+    if (!file) {
+      preview.classList.remove("show");
+      preview.src = "";
+      return;
+    }
+
+    // Validate file type
+    const allowedTypes = ["image/jpeg", "image/jpg", "image/png"];
+    if (!allowedTypes.includes(file.type)) {
+      input.classList.add("is-invalid");
+      dropzone.classList.add("invalid");
+      feedbackDiv.textContent = "Only JPG, JPEG, and PNG images are allowed.";
+      feedbackDiv.style.display = "block";
+      input.value = ""; // Clear the input
+      preview.classList.remove("show");
+      preview.src = "";
+      return;
+    }
+
+    // Validate file size (5MB = 5 * 1024 * 1024 bytes)
+    const maxSize = 5 * 1024 * 1024;
+    if (file.size > maxSize) {
+      input.classList.add("is-invalid");
+      dropzone.classList.add("invalid");
+      const sizeMB = (file.size / (1024 * 1024)).toFixed(2);
+      feedbackDiv.textContent = `File size (${sizeMB}MB) exceeds 5MB limit.`;
+      feedbackDiv.style.display = "block";
+      input.value = ""; // Clear the input
+      preview.classList.remove("show");
+      preview.src = "";
+      return;
+    }
+
+    // File is valid - show green border and preview
+    input.classList.add("is-valid");
+    dropzone.classList.add("valid");
+
+    const reader = new FileReader();
+    reader.onload = function (e) {
+      preview.src = e.target.result;
+      preview.classList.add("show");
+    };
+    reader.readAsDataURL(file);
   }
+
+  // Reset form and file input when modal is hidden
+  document.addEventListener("DOMContentLoaded", function () {
+    const modals = document.querySelectorAll(".modal");
+    modals.forEach(function (modal) {
+      modal.addEventListener("hidden.bs.modal", function () {
+        const form = modal.querySelector("form");
+        if (form) {
+          // Clear file input FIRST (before form.reset())
+          const fileInput = form.querySelector('input[type="file"]');
+          const isEditModal = modal.id.includes("editStudentModal");
+          const originalPhotoSrc = fileInput
+            ? document
+                .getElementById(
+                  fileInput.getAttribute("onchange").match(/preview-[^']+/)[0]
+                )
+                ?.getAttribute("data-original-src")
+            : null;
+
+          if (fileInput) {
+            // Clone and replace the file input to truly clear it
+            const newFileInput = fileInput.cloneNode(true);
+            fileInput.parentNode.replaceChild(newFileInput, fileInput);
+
+            const previewId = newFileInput
+              .getAttribute("onchange")
+              .match(/preview-[^']+/)[0];
+            const preview = document.getElementById(previewId);
+
+            if (preview) {
+              // For edit modals, restore original photo; for add modals, clear it
+              if (isEditModal && originalPhotoSrc) {
+                preview.src = originalPhotoSrc;
+                preview.classList.add("show");
+              } else {
+                preview.classList.remove("show");
+                preview.src = "";
+              }
+            }
+
+            // Clear validation states
+            newFileInput.classList.remove("is-valid", "is-invalid");
+            const dropzone = newFileInput.closest(".upload-dropzone");
+            if (dropzone) {
+              dropzone.classList.remove("invalid", "valid");
+            }
+            const feedback = newFileInput
+              .closest(".mb-3")
+              ?.querySelector(".invalid-feedback");
+            if (feedback) {
+              feedback.style.display = "none";
+            }
+          }
+
+          // Reset the rest of the form
+          form.reset();
+
+          // Remove all validation classes
+          form.classList.remove("was-validated");
+          form
+            .querySelectorAll(".is-valid, .is-invalid")
+            .forEach(function (el) {
+              el.classList.remove("is-valid", "is-invalid");
+            });
+
+          // Hide all feedback messages
+          form.querySelectorAll(".invalid-feedback").forEach(function (fb) {
+            fb.style.display = "none";
+          });
+        }
+      });
+    });
+
+    // Store original photo URLs for edit modals
+    modals.forEach(function (modal) {
+      modal.addEventListener("show.bs.modal", function () {
+        const form = modal.querySelector("form");
+        if (form) {
+          const fileInput = form.querySelector('input[type="file"]');
+          if (fileInput) {
+            const previewId = fileInput
+              .getAttribute("onchange")
+              .match(/preview-[^']+/)[0];
+            const preview = document.getElementById(previewId);
+            if (preview && preview.src && preview.classList.contains("show")) {
+              // Store the original src as a data attribute
+              preview.setAttribute("data-original-src", preview.src);
+            }
+          }
+        }
+      });
+    });
+  });
 </script>
