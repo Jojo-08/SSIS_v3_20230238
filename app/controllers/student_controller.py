@@ -28,6 +28,16 @@ def upload_resized_image(photo, student_id):
         img = Image.open(photo)
     except Exception as e:
         raise ValueError("Invalid or corrupted image file. Please upload a valid JPG or PNG image.")
+    # 1. Validate file is an actual image
+    try:
+        img = Image.open(photo)
+        # Verify it's a real image by loading the data
+        img.verify()
+        # Re-open after verify (verify() closes the file)
+        photo.seek(0)
+        img = Image.open(photo)
+    except Exception as e:
+        raise ValueError("Invalid or corrupted image file. Please upload a valid JPG or PNG image.")
     
     # 2. Determine the format (default to JPEG if unknown)
     # img.format returns 'JPEG', 'PNG', 'GIF', etc.
