@@ -7,7 +7,7 @@ CREATE TABLE programs (
     program_code VARCHAR(10) PRIMARY KEY,
     program_name VARCHAR(255) NOT NULL,
     college_code VARCHAR(10),
-    FOREIGN KEY (college_code) REFERENCES colleges (college_code) ON DELETE CASCADE ON UPDATE CASCADE
+    FOREIGN KEY (college_code) REFERENCES colleges (college_code) ON DELETE SET NULL ON UPDATE CASCADE
 );
 
 CREATE TABLE students (

@@ -14,10 +14,15 @@ def list_programs():
     sort_by = request.args.get('sort_by', 'program_code')
     sort_order = request.args.get('sort_order', 'asc')
     
-    programs = Program.get_all(page, per_page, sort_by, sort_order)
-    total = Program.get_total_num()
+    # Get filter parameters
+    filters = {}
+    if request.args.get('filter_college'):
+        filters['college_code'] = request.args.get('filter_college')
+    
+    programs = Program.get_all(page, per_page, sort_by, sort_order, filters)
+    total = Program.get_total_num(filters)
 
-    # Get all colleges for the dropdown
+    # Get all colleges for the dropdown and filters
     all_colleges = College.get_all(page=1, per_page=100)
     college_choices = [(c['college_code'], c['college_code']) for c in all_colleges]
 
@@ -38,7 +43,8 @@ def list_programs():
 
     program_forms = list(zip(programs, edit_forms))
    
-    return render_template('program/program.html', programs=programs, Total=total, page=page, per_page=per_page, sort_by=sort_by, sort_order=sort_order, add_form=add_form, program_forms=program_forms, open_modal=open_modal)
+    return render_template('program/program.html', programs=programs, Total=total, page=page, per_page=per_page, sort_by=sort_by, sort_order=sort_order, 
+                         add_form=add_form, program_forms=program_forms, open_modal=open_modal, colleges=all_colleges, filters=filters)
 
 @program_bp.route('/add', methods=['POST'])
 @login_required

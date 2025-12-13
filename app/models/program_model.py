@@ -10,7 +10,7 @@ class Program:
         
   
 
-    def get_all(page=1, per_page=20, sort_by='program_code', sort_order='asc'):
+    def get_all(page=1, per_page=20, sort_by='program_code', sort_order='asc', filters=None):
         conn = get_db()
         cur = conn.cursor()
         offset = (page - 1) * per_page
@@ -22,16 +22,45 @@ class Program:
         if sort_order not in ['asc', 'desc']:
             sort_order = 'asc'
         
-        query = f"SELECT * FROM programs ORDER BY {sort_by} {sort_order.upper()} LIMIT %s OFFSET %s"
-        cur.execute(query, (per_page, offset))
+        # Build WHERE clause based on filters
+        where_clauses = []
+        params = []
+        
+        if filters:
+            if filters.get('college_code'):
+                where_clauses.append("college_code = %s")
+                params.append(filters['college_code'])
+        
+        base_query = "SELECT * FROM programs"
+        if where_clauses:
+            base_query += " WHERE " + " AND ".join(where_clauses)
+        
+        query = f"{base_query} ORDER BY {sort_by} {sort_order.upper()} LIMIT %s OFFSET %s"
+        params.extend([per_page, offset])
+        
+        cur.execute(query, tuple(params))
         programs = cur.fetchall()
         cur.close()
         return programs
 
-    def get_total_num():
+    def get_total_num(filters=None):
         conn = get_db()
         cur = conn.cursor()
-        cur.execute("SELECT COUNT(*) as count FROM programs")
+        
+        # Build WHERE clause based on filters
+        where_clauses = []
+        params = []
+        
+        if filters:
+            if filters.get('college_code'):
+                where_clauses.append("college_code = %s")
+                params.append(filters['college_code'])
+        
+        base_query = "SELECT COUNT(*) as count FROM programs"
+        if where_clauses:
+            base_query += " WHERE " + " AND ".join(where_clauses)
+        
+        cur.execute(base_query, tuple(params) if params else None)
         total = cur.fetchone()['count']
         cur.close()
         return total

@@ -19,7 +19,7 @@ class Student:
 
   
 
-    def get_all(page=1, per_page=20, sort_by='student_id', sort_order='asc'):
+    def get_all(page=1, per_page=20, sort_by='student_id', sort_order='asc', filters=None):
         conn = get_db()
         cur = conn.cursor()
         offset = (page - 1) * per_page
@@ -31,16 +31,73 @@ class Student:
         if sort_order not in ['asc', 'desc']:
             sort_order = 'asc'
         
-        query = f"SELECT * FROM students ORDER BY {sort_by} {sort_order.upper()} LIMIT %s OFFSET %s"
-        cur.execute(query, (per_page, offset))
+        # Build WHERE clause based on filters
+        where_clauses = []
+        params = []
+        
+        if filters:
+            if filters.get('year'):
+                where_clauses.append("s.year = %s")
+                params.append(filters['year'])
+            if filters.get('gender'):
+                where_clauses.append("s.gender = %s")
+                params.append(filters['gender'])
+            if filters.get('program_code'):
+                where_clauses.append("s.program_code = %s")
+                params.append(filters['program_code'])
+            if filters.get('college_code'):
+                where_clauses.append("p.college_code = %s")
+                params.append(filters['college_code'])
+        
+        # Build query - join with programs if filtering by college
+        if filters and filters.get('college_code'):
+            base_query = "SELECT s.* FROM students s JOIN programs p ON s.program_code = p.program_code"
+        else:
+            base_query = "SELECT s.* FROM students s"
+        
+        if where_clauses:
+            base_query += " WHERE " + " AND ".join(where_clauses)
+        
+        query = f"{base_query} ORDER BY s.{sort_by} {sort_order.upper()} LIMIT %s OFFSET %s"
+        params.extend([per_page, offset])
+        
+        cur.execute(query, tuple(params))
         students = cur.fetchall()
         cur.close()
         return students
 
-    def get_total_num():
+    def get_total_num(filters=None):
         conn = get_db()
         cur = conn.cursor()
-        cur.execute("SELECT COUNT(*) as count FROM students")
+        
+        # Build WHERE clause based on filters
+        where_clauses = []
+        params = []
+        
+        if filters:
+            if filters.get('year'):
+                where_clauses.append("s.year = %s")
+                params.append(filters['year'])
+            if filters.get('gender'):
+                where_clauses.append("s.gender = %s")
+                params.append(filters['gender'])
+            if filters.get('program_code'):
+                where_clauses.append("s.program_code = %s")
+                params.append(filters['program_code'])
+            if filters.get('college_code'):
+                where_clauses.append("p.college_code = %s")
+                params.append(filters['college_code'])
+        
+        # Build query - join with programs if filtering by college
+        if filters and filters.get('college_code'):
+            base_query = "SELECT COUNT(*) as count FROM students s JOIN programs p ON s.program_code = p.program_code"
+        else:
+            base_query = "SELECT COUNT(*) as count FROM students s"
+        
+        if where_clauses:
+            base_query += " WHERE " + " AND ".join(where_clauses)
+        
+        cur.execute(base_query, tuple(params) if params else None)
         total = cur.fetchone()['count']
         cur.close()
         return total

@@ -22,8 +22,12 @@ class StudentForm(FlaskForm):
     last_name = StringField('Last Name', validators=[DataRequired(),Length(max=255,message='Your input has exceedded that maximum number of characters needed')])
     program_code = SelectField('Program Code',
                     choices=[], validators=[DataRequired()])
-    year = StringField('Year', validators=[DataRequired()])
-    gender = StringField('Gender', validators=[DataRequired()])
+    year = SelectField('Year', 
+                    choices=[('1', '1'), ('2', '2'), ('3', '3'), ('4', '4')], 
+                    validators=[DataRequired()])
+    gender = SelectField('Gender', 
+                    choices=[('Male', 'Male'), ('Female', 'Female')], 
+                    validators=[DataRequired()])
     photo = FileField('Photo', validators=[FileAllowed(['jpg', 'png', 'jpeg'], 'Make sure file format is in jpg, png, or jpeg only!')])
     submit = SubmitField('Submit')
 

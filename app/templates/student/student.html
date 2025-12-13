@@ -3,17 +3,89 @@
 <h2>Students</h2>
 {%endblock%} {% block paragraph %}
 <p>Manage your Students and their Information</p>
+{% endblock %}
+
+{% block filters %}
+<div class="mb-3">
+  <button class="btn btn-outline-primary" type="button" data-bs-toggle="collapse" data-bs-target="#filterCollapse" aria-expanded="{% if filters %}true{% else %}false{% endif %}" aria-controls="filterCollapse">
+    <i class="bi bi-funnel"></i> Filters {% if filters %}<span class="badge bg-primary">{{ filters|length }}</span>{% endif %}
+  </button>
+  
+  <div class="collapse mt-2 {% if filters %}show{% endif %}" id="filterCollapse">
+    <div class="card">
+      <div class="card-body">
+        <form method="GET" action="{{ url_for('Student.list_students') }}" class="row g-3">
+          <div class="col-md-3">
+            <label for="filter_year" class="form-label">Year</label>
+            <select class="form-select" id="filter_year" name="filter_year">
+              <option value="">All Years</option>
+              <option value="1" {% if filters.get('year') == '1' %}selected{% endif %}>1</option>
+              <option value="2" {% if filters.get('year') == '2' %}selected{% endif %}>2</option>
+              <option value="3" {% if filters.get('year') == '3' %}selected{% endif %}>3</option>
+              <option value="4" {% if filters.get('year') == '4' %}selected{% endif %}>4</option>
+            </select>
+          </div>
+          <div class="col-md-3">
+            <label for="filter_gender" class="form-label">Gender</label>
+            <select class="form-select" id="filter_gender" name="filter_gender">
+              <option value="">All Genders</option>
+              <option value="Male" {% if filters.get('gender') == 'Male' %}selected{% endif %}>Male</option>
+              <option value="Female" {% if filters.get('gender') == 'Female' %}selected{% endif %}>Female</option>
+            </select>
+          </div>
+          <div class="col-md-3">
+            <label for="filter_college" class="form-label">College</label>
+            <select class="form-select" id="filter_college" name="filter_college">
+              <option value="">All Colleges</option>
+              {% for college in colleges %}
+              <option value="{{ college.college_code }}" {% if filters.get('college_code') == college.college_code %}selected{% endif %}>
+                {{ college.college_code }}
+              </option>
+              {% endfor %}
+            </select>
+          </div>
+          <div class="col-md-3">
+            <label for="filter_program" class="form-label">Program</label>
+            <select class="form-select" id="filter_program" name="filter_program">
+              <option value="">All Programs</option>
+              {% for program in programs %}
+              <option value="{{ program.program_code }}" data-college="{{ program.college_code }}" {% if filters.get('program_code') == program.program_code %}selected{% endif %}>
+                {{ program.program_code }}
+              </option>
+              {% endfor %}
+            </select>
+          </div>
+          <div class="col-12">
+            <a href="{{ url_for('Student.list_students') }}" class="btn btn-secondary btn-sm">
+              <i class="bi bi-x-lg"></i> Clear All Filters
+            </a>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
 {% endblock %} {% block header2%}
 <h5 class="card-title">Students({{Total}})</h5>
 {% endblock %} {% block table_id %}student-table{% endblock %} {% block
 modal_target %}addStudentModal{% endblock %} {% block table_head %}
+{% set filter_params = [] %}
+{% if filters %}
+  {% for key, value in filters.items() %}
+    {% if value %}
+      {% set _ = filter_params.append('filter_' + key + '=' + value|string) %}
+    {% endif %}
+  {% endfor %}
+{% endif %}
+{% set filter_string = '&' + filter_params|join('&') if filter_params else '' %}
+
 <tr>
   <th>Photo</th>
   <th
     class="sortable {% if sort_by == 'student_id' %}{{ sort_order }}{% endif %}"
   >
     <a
-      href="?sort_by=student_id&sort_order={% if sort_by == 'student_id' and sort_order == 'asc' %}desc{% else %}asc{% endif %}&page=1"
+      href="?sort_by=student_id&sort_order={% if sort_by == 'student_id' and sort_order == 'asc' %}desc{% else %}asc{% endif %}&page=1{{ filter_string }}"
       class="text-decoration-none text-dark"
       >Student ID</a
     >
@@ -22,7 +94,7 @@ modal_target %}addStudentModal{% endblock %} {% block table_head %}
     class="sortable {% if sort_by == 'firstname' %}{{ sort_order }}{% endif %}"
   >
     <a
-      href="?sort_by=firstname&sort_order={% if sort_by == 'firstname' and sort_order == 'asc' %}desc{% else %}asc{% endif %}&page=1"
+      href="?sort_by=firstname&sort_order={% if sort_by == 'firstname' and sort_order == 'asc' %}desc{% else %}asc{% endif %}&page=1{{ filter_string }}"
       class="text-decoration-none text-dark"
       >First Name</a
     >
@@ -31,7 +103,7 @@ modal_target %}addStudentModal{% endblock %} {% block table_head %}
     class="sortable {% if sort_by == 'lastname' %}{{ sort_order }}{% endif %}"
   >
     <a
-      href="?sort_by=lastname&sort_order={% if sort_by == 'lastname' and sort_order == 'asc' %}desc{% else %}asc{% endif %}&page=1"
+      href="?sort_by=lastname&sort_order={% if sort_by == 'lastname' and sort_order == 'asc' %}desc{% else %}asc{% endif %}&page=1{{ filter_string }}"
       class="text-decoration-none text-dark"
       >Last Name</a
     >
@@ -40,21 +112,21 @@ modal_target %}addStudentModal{% endblock %} {% block table_head %}
     class="sortable {% if sort_by == 'program_code' %}{{ sort_order }}{% endif %}"
   >
     <a
-      href="?sort_by=program_code&sort_order={% if sort_by == 'program_code' and sort_order == 'asc' %}desc{% else %}asc{% endif %}&page=1"
+      href="?sort_by=program_code&sort_order={% if sort_by == 'program_code' and sort_order == 'asc' %}desc{% else %}asc{% endif %}&page=1{{ filter_string }}"
       class="text-decoration-none text-dark"
       >Program</a
     >
   </th>
   <th class="sortable {% if sort_by == 'year' %}{{ sort_order }}{% endif %}">
     <a
-      href="?sort_by=year&sort_order={% if sort_by == 'year' and sort_order == 'asc' %}desc{% else %}asc{% endif %}&page=1"
+      href="?sort_by=year&sort_order={% if sort_by == 'year' and sort_order == 'asc' %}desc{% else %}asc{% endif %}&page=1{{ filter_string }}"
       class="text-decoration-none text-dark"
       >Year</a
     >
   </th>
   <th class="sortable {% if sort_by == 'gender' %}{{ sort_order }}{% endif %}">
     <a
-      href="?sort_by=gender&sort_order={% if sort_by == 'gender' and sort_order == 'asc' %}desc{% else %}asc{% endif %}&page=1"
+      href="?sort_by=gender&sort_order={% if sort_by == 'gender' and sort_order == 'asc' %}desc{% else %}asc{% endif %}&page=1{{ filter_string }}"
       class="text-decoration-none text-dark"
       >Gender</a
     >
@@ -129,4 +201,62 @@ form in student_forms %} {% set modal_id = 'editStudentModal-' + s['student_id']
 %} {% set entity_name = 'Student' %} {% set modal_title = 'Edit Student' %} {%
 set action_url = url_for('Student.edit_student', student_id=s['student_id']) %}
 {% set current_photo_url = s['photo_url'] %} {% include 'layout/form_modal.html'
-%} {% endfor %} {%endblock%}
+%} {% endfor %} 
+
+<script>
+  // Auto-submit filters on change and dynamic program filtering
+  document.addEventListener('DOMContentLoaded', function() {
+    const filterForm = document.querySelector('#filterCollapse form');
+    if (filterForm) {
+      const collegeSelect = document.getElementById('filter_college');
+      const programSelect = document.getElementById('filter_program');
+      const allProgramOptions = Array.from(programSelect.querySelectorAll('option'));
+      
+      // Function to filter programs based on selected college
+      function filterPrograms() {
+        const selectedCollege = collegeSelect.value;
+        const currentProgram = programSelect.value;
+        
+        // Clear current options
+        programSelect.innerHTML = '';
+        
+        // Add back filtered options
+        allProgramOptions.forEach(option => {
+          if (option.value === '' || !selectedCollege || option.dataset.college === selectedCollege) {
+            programSelect.appendChild(option.cloneNode(true));
+          }
+        });
+        
+        // Restore previous selection if it's still available
+        if (currentProgram) {
+          const optionExists = Array.from(programSelect.options).some(opt => opt.value === currentProgram);
+          if (optionExists) {
+            programSelect.value = currentProgram;
+          }
+        }
+      }
+      
+      // Filter programs on college change (but don't submit yet)
+      collegeSelect.addEventListener('change', function() {
+        filterPrograms();
+        // Submit form after filtering
+        filterForm.submit();
+      });
+      
+      // Auto-submit other filters on change
+      const filterSelects = filterForm.querySelectorAll('select');
+      filterSelects.forEach(select => {
+        if (select.id !== 'filter_college') {
+          select.addEventListener('change', function() {
+            filterForm.submit();
+          });
+        }
+      });
+      
+      // Initialize program filtering on page load
+      filterPrograms();
+    }
+  });
+</script>
+
+{%endblock%}

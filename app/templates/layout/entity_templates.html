@@ -30,6 +30,13 @@ block content %}
   .search-highlight {
     background-color: #fff3cd;
   }
+  /* Force filter dropdowns to open downward */
+  #filterCollapse .form-select {
+    position: relative;
+  }
+  #filterCollapse {
+    margin-bottom: 1rem;
+  }
 </style>
 
 <div class="container">
@@ -38,13 +45,16 @@ block content %}
   {%endblock%} {% block paragraph %}
   <p>Manage your students and their Information</p>
   {% endblock %}
+
+  <!-- Filters Section -->
+  {% block filters %}{% endblock %}
 </div>
 <div class="container">
   <div class="container-fluid">
     <!-- Search Input -->
-    <div class="row">
-      <div class="col-md-6">
-        <div class="input-group">
+    <div class="d-flex flex-row flex-fill mb-2">
+      <div class="col-md-12 d-flex flex-row">
+        <div class="input-group d-flex">
           <span class="input-group-text"><i class="bi bi-search"></i></span>
           <input
             class="form-control"
@@ -143,7 +153,12 @@ block content %}
       ((Total|default(0)) / per_page)|round(0, 'ceil')|int %} {% set
       current_page = page|default(1) %} {% set current_sort_by =
       sort_by|default('') %} {% set current_sort_order =
-      sort_order|default('asc') %} {% if total_pages > 1 %}
+      sort_order|default('asc') %} {% set filter_params = [] %} {% if filters %}
+      {% for key, value in filters.items() %} {% if value %} {% set _ =
+      filter_params.append('filter_' + key + '=' + value|string) %} {% endif %}
+      {% endfor %} {% endif %} {% set filter_string = '&' +
+      filter_params|join('&') if filter_params else '' %} {% if total_pages > 1
+      %}
       <nav>
         <ul
           class="pagination justify-content-center"
@@ -153,7 +168,7 @@ block content %}
           <li class="page-item {% if current_page <= 1 %}disabled{% endif %}">
             <a
               class="page-link"
-              href="?page={{ current_page - 1 }}&sort_by={{ current_sort_by }}&sort_order={{ current_sort_order }}"
+              href="?page={{ current_page - 1 }}&sort_by={{ current_sort_by }}&sort_order={{ current_sort_order }}{{ filter_string }}"
               >Previous</a
             >
           </li>
@@ -164,7 +179,7 @@ block content %}
           <li class="page-item {% if p == current_page %}active{% endif %}">
             <a
               class="page-link"
-              href="?page={{ p }}&sort_by={{ current_sort_by }}&sort_order={{ current_sort_order }}"
+              href="?page={{ p }}&sort_by={{ current_sort_by }}&sort_order={{ current_sort_order }}{{ filter_string }}"
               >{{ p }}</a
             >
           </li>
@@ -180,7 +195,7 @@ block content %}
           >
             <a
               class="page-link"
-              href="?page={{ current_page + 1 }}&sort_by={{ current_sort_by }}&sort_order={{ current_sort_order }}"
+              href="?page={{ current_page + 1 }}&sort_by={{ current_sort_by }}&sort_order={{ current_sort_order }}{{ filter_string }}"
               >Next</a
             >
           </li>
@@ -194,5 +209,19 @@ block content %}
 
 <!-- Table Utilities (Search & Sort) -->
 <script src="{{ url_for('static', filename='js/table-utils.js') }}"></script>
+
+<!-- Fix dropdown direction in filter collapse -->
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    // Ensure filter collapse has enough space when opened
+    const filterCollapse = document.getElementById("filterCollapse");
+    if (filterCollapse) {
+      filterCollapse.addEventListener("show.bs.collapse", function () {
+        // Scroll to top of filter section to ensure dropdown space
+        this.scrollIntoView({ behavior: "smooth", block: "start" });
+      });
+    }
+  });
+</script>
 
 {%endblock%}

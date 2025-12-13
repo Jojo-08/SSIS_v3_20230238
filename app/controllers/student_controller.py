@@ -86,8 +86,19 @@ def list_students():
     sort_by = request.args.get('sort_by', 'student_id')
     sort_order = request.args.get('sort_order', 'asc')
     
-    students = Student.get_all(page, per_page, sort_by, sort_order)
-    total = Student.get_total_num()
+    # Get filter parameters
+    filters = {}
+    if request.args.get('filter_year'):
+        filters['year'] = request.args.get('filter_year')
+    if request.args.get('filter_gender'):
+        filters['gender'] = request.args.get('filter_gender')
+    if request.args.get('filter_program'):
+        filters['program_code'] = request.args.get('filter_program')
+    if request.args.get('filter_college'):
+        filters['college_code'] = request.args.get('filter_college')
+    
+    students = Student.get_all(page, per_page, sort_by, sort_order, filters)
+    total = Student.get_total_num(filters)
 
     # Generate signed URLs for private access
     for s in students:
@@ -111,9 +122,13 @@ def list_students():
             except Exception as e:
                 print(f"Error signing URL for {s['student_id']}: {e}")
 
-    # Get all programs for the dropdown
+    # Get all programs and colleges for dropdowns and filters
     all_programs = Program.get_all(page=1, per_page=100)
     program_choices = [(p['program_code'], p['program_code']) for p in all_programs]
+    
+    from app.models.college_model import College
+    all_colleges = College.get_all(page=1, per_page=100)
+    college_choices = [(c['college_code'], c['college_code']) for c in all_colleges]
     
     add_form = StudentForm()
     add_form.program_code.choices = program_choices
@@ -134,7 +149,9 @@ def list_students():
     open_modal =request.args.get('open_modal')
 
     student_forms = list(zip(students,edit_forms))
-    return render_template('student/student.html', Total=total, page=page, per_page=per_page, sort_by=sort_by, sort_order=sort_order, add_form=add_form, student_forms=student_forms, students=students, open_modal=open_modal)
+    return render_template('student/student.html', Total=total, page=page, per_page=per_page, sort_by=sort_by, sort_order=sort_order, 
+                         add_form=add_form, student_forms=student_forms, students=students, open_modal=open_modal,
+                         programs=all_programs, colleges=all_colleges, filters=filters)
 
 @student_bp.route('/add', methods=['POST'])
 @login_required
